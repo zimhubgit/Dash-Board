@@ -69,8 +69,9 @@ dash_screens: dict[str:DashScreen] = {}
 
 @staticmethod
 def gsk_div():
-    div: html.Div = html.Div(children=[html.Div(title='Achievements',
-                                                id=IDs.gsk,
+    div: html.Div = html.Div(id=IDs.gsk,
+                             children=[html.Div(title='Achievements',
+                                                id=IDs.achievements,
                                                 style={Naming.height: '25%'},
                                                 children=[html.H4('Achievements',
                                                                   style={}),
@@ -151,7 +152,7 @@ app.layout = html.Div(id=IDs.dashboard,
                                                 Naming.flex_direction: Naming.flex_row,
                                                 Naming.height: '90%'
                                                 },
-                                         children=[html.Div(title='Parameters',
+                                         children=[html.Nav(title='Parameters',
                                                             id=IDs.parameters,
                                                             style={Naming.width: '15%',
                                                                    },
