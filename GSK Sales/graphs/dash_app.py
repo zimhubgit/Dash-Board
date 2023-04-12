@@ -41,9 +41,21 @@ class Naming:
 
 
 class IDs:
+    stocks = 'stocks_id'
+    time_achievements = 'achievements_in_time_id'
+    achievements = 'achievements_id'
     graphs = 'graphs_id'
     parameters = 'parameters_id'
     dashboard = 'dashboard_id'
+    gsk = 'gsk_id'
+    # Achievements Div
+    overall_achievements = 'overall_id'
+    overall_indicator = 'overall_indicator_id'
+    detailed_achievements = 'detailed_id'
+    # Repartition Div
+    achievements_repartition = 'repartition_id'
+    funnel_repartition = 'sankey_id'
+    sunburst_repartition = 'sunburst_id'
 
 
 class DashScreen:
@@ -58,33 +70,59 @@ dash_screens: dict[str:DashScreen] = {}
 @staticmethod
 def gsk_div():
     div: html.Div = html.Div(children=[html.Div(title='Achievements',
-                                                id='gsk1',
+                                                id=IDs.gsk,
                                                 style={Naming.height: '25%'},
-                                                children=[html.Div(style={Naming.display: Naming.flex,
-                                                                          Naming.flex_direction: Naming.flex_col},
-                                                                   children=[html.Div(title='Overall Achievements',
-                                                                                      id='gsk1.1'),
+                                                children=[html.H4('Achievements',
+                                                                  style={}),
+                                                          html.Br(),
+                                                          html.Div(id=IDs.achievements,
+                                                                   style={Naming.display: Naming.flex,
+                                                                          Naming.flex_direction: Naming.flex_row},
+                                                                   children=[html.Label('Overall Achievements'),
+                                                                             html.Div(title='Overall Achievements',
+                                                                                      id=IDs.overall_achievements,
+                                                                                      style={}),
                                                                              html.Div(title='Detailed Achievements',
-                                                                                      children=[html.Div(),
-                                                                                                ],
+                                                                                      id=IDs.detailed_achievements,
+                                                                                      style={},
+                                                                                      children=[html.Label(
+                                                                                          'Detailed Achievements'),
+                                                                                      ],
                                                                                       ),
                                                                              ],
                                                                    ),
                                                           ],
                                                 ),
                                        html.Div(title='Achievements repartition',
-                                                id='gsk2',
-                                                children=[],
-                                                style={Naming.height: '25%'},
+                                                id=IDs.achievements_repartition,
+                                                style={Naming.flex_direction: Naming.flex_row,
+                                                       Naming.height: '25%',
+                                                       },
+                                                children=[html.Div(id=IDs.funnel_repartition,
+                                                                   style={Naming.width: '50%',
+                                                                          },
+                                                                   children=[html.Label('Funnel Graph'),
+                                                                             ],
+                                                                   ),
+                                                          html.Hr(),
+                                                          html.Div(id=IDs.sunburst_repartition,
+                                                                   style={Naming.width: '50%',
+                                                                          },
+                                                                   children=[html.Label('Sunburst Graph'),
+                                                                             ],
+                                                                   ),
+                                                          ],
                                                 ),
-                                       html.Div(id='gsk3',
+                                       html.Div(id=IDs.time_achievements,
                                                 title='Achievements in time',
-                                                children=[],
+                                                children=[html.H4('Achievements in time'),
+                                                          ],
                                                 style={Naming.height: '25%'},
                                                 ),
                                        html.Div(title='Stocks / Sales history',
-                                                id='gsk4',
-                                                children=[],
+                                                id=IDs.stocks,
+                                                children=[html.H4('Stocks / Sales history'),
+                                                          ],
                                                 style={Naming.height: '25%'},
                                                 )
                                        ],
@@ -103,35 +141,40 @@ load()
 app = Dash(__name__)
 
 app.layout = html.Div(id=IDs.dashboard,
-                      children=[html.H1('Dashboard',
-                                        style={'color': '#fc7b03',
-                                               },
-                                        ),
-                                html.Hr(),
-                                html.Div(title='Parameters',
-                                         id=IDs.parameters,
-                                         style={Naming.width: '20%',
+                      children=[html.Div('Dashboard',
+                                         style={'color': '#fc7b03',
+                                                Naming.height: '10%',
                                                 Naming.border: '1px solid black',
                                                 },
-                                         children=[html.Label('Parameters'),
+                                         ),
+                                html.Div(style={Naming.display: Naming.flex,
+                                                Naming.flex_direction: Naming.flex_row,
+                                                Naming.height: '90%'
+                                                },
+                                         children=[html.Div(title='Parameters',
+                                                            id=IDs.parameters,
+                                                            style={Naming.width: '15%',
+                                                                   },
+                                                            children=[html.H3('Parameters'),
+                                                                      ],
+                                                            ),
+                                                   html.Hr(),
+                                                   html.Div(title='Sales Graphs',
+                                                            id=IDs.graphs,
+                                                            style={Naming.width: '85%',
+                                                                   Naming.padding: '10px'},
+                                                            children=[html.H3('Sales Graphs'),
+                                                                      dash_screens[Naming.gsk_screen].Div,
+                                                                      ],
+                                                            ),
                                                    ],
                                          ),
-                                html.Hr(),
-                                html.Div(title='Sales Graphs',
-                                         id=IDs.graphs,
-                                         style={Naming.width: '80%',
-                                                Naming.border: '1px solid black',
-                                                },
-                                         children=[html.Label('Sales Graphs'),
-                                                   dash_screens[Naming.gsk_screen].Div,
-                                                   ],
-                                         )
                                 ],
                       style={Naming.display: Naming.flex,
-                             Naming.flex_direction: Naming.flex_row,
-                             Naming.height: '100%',
+                             Naming.flex_direction: Naming.flex_col,
                              Naming.border: '1px solid black',
-                             Naming.padding: '10px'},
+                             Naming.padding: '10px',
+                             },
                       )
 
 app.run_server(debug=True)
