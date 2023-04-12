@@ -5,7 +5,7 @@ import plotly.graph_objects as go
 from dash import Dash, dcc, html, Input, Output, State
 
 import periods
-from src import name_space as nm
+from parametres.src import name_space as nm
 
 data_dict = pnd.read_excel('/home/nazim/Devs/GSK Sales/output/GSK SALES.xlsx', sheet_name=None)
 sales_df_22 = data_dict['2022']

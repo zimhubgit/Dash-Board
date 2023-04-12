@@ -5,7 +5,7 @@ import pandas as pnd
 import plotly.express as px
 import plotly.graph_objects as go
 
-from src import name_space as nm
+from parametres.src import name_space as nm
 
 
 class GSKSalesGraph:

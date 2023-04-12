@@ -1,7 +1,8 @@
 import pandas as pnd
 
-from src import gsk_sales as sls, name_space as nm
-from src.parameters import Parameters as Params
+import gsk_sales as sls
+from parametres.src import name_space as nm
+from parametres.src.parameters import Parameters as Params
 
 DESIGNATION_CONF: pnd.DataFrame
 SKU_ORDER_DF: pnd.DataFrame

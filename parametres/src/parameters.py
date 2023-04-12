@@ -1,9 +1,9 @@
 import os
 
 import pandas as pnd
-from util import Utilities as Ut
 
-import src.name_space as nm
+import parametres.src.name_space as nm
+from utilities.src.util import Utilities as Ut
 
 
 class Parameters:

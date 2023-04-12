@@ -1,8 +1,8 @@
 import pandas as pnd
 import plotly.graph_objects as go
 
-from src.name_space import GSK
-from src import gsk_sales as sls
+from parametres.src.name_space import GSK
+import gsk_sales as sls
 
 
 class GraphicsData:
