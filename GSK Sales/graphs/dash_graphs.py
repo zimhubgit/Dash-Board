@@ -7,7 +7,7 @@ from dash import Dash, dcc, html, Input, Output, State
 import periods
 from parametres.src import name_space as nm
 
-data_dict = pnd.read_excel('/home/nazim/Devs/GSK Sales/output/GSK SALES.xlsx', sheet_name=None)
+data_dict = pnd.read_excel('/home/nazim/Dev Projects/Dash Board/GSK Sales/output/GSK SALES.xlsx', sheet_name=None)
 sales_df_22 = data_dict['2022']
 sales_df_23 = data_dict['2023']
 update_date = pnd.to_datetime(sales_df_23[nm.GSK.ColName.UPDATED_ON].values[0])
