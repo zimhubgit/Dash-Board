@@ -1,7 +1,7 @@
 from datetime import datetime
 
 import pandas as pnd
-from dash import html, Dash
+from dash import html, Dash, dcc
 
 
 class PeriodsDates:
@@ -38,9 +38,25 @@ class Naming:
     border = 'border'
     padding = 'padding'
     gsk_screen = 'GSK'
+    text_deco = 'text-decoration'
+    underline = 'underline'
+    font_weight = 'font-weight'
+    bold = 'bold',
+    color = 'color'
 
 
 class IDs:
+    gsk_year_indic = 'gsk_year_indicator_id'
+    gsk_half_indic = 'gsk_half_indicator_id'
+    gsk_quarter_indic = 'gsk_quarter_indicator_id'
+    gsk_month_indic = 'gsk_month_indicator_id'
+    all_periods_overall_achievements = 'all_periods_overall_id'
+    show_b = 'show_button_id'
+    periods_dd = 'periods_list_id'
+    periods_rb = 'periods_id'
+    brands_dd = 'brands_id'
+    data_source_dd = 'datasource_id'
+    nav_bar = 'nav_bar_id'
     stocks = 'stocks_id'
     time_achievements = 'achievements_in_time_id'
     achievements = 'achievements_id'
@@ -147,6 +163,74 @@ def gsk_div():
     dash_screens.update({Naming.gsk_screen: DashScreen(Naming.gsk_screen, div)})
 
 
+def nav_bar() -> html.Div:
+    nav_bar = html.Div(id=IDs.nav_bar,
+                       style={Naming.padding: '10px',
+                              },
+                       children=[html.Label('Data Sources:',
+                                            style={Naming.text_deco: Naming.underline,
+                                                   Naming.font_weight: Naming.bold,
+                                                   Naming.color: 'grey',
+                                                   },
+                                            ),
+                                 dcc.Dropdown(id=IDs.data_source_dd,
+                                              options=['GSK', 'AT PHARMA', 'IQVIA'],
+                                              value='GSK',
+                                              clearable=False,
+                                              searchable=True,
+                                              multi=True,
+                                              ),
+                                 html.Hr(),
+                                 html.Br(),
+                                 html.Label('Brands:',
+                                            style={Naming.text_deco: Naming.underline,
+                                                   Naming.font_weight: Naming.bold,
+                                                   Naming.color: 'grey',
+                                                   }),
+                                 dcc.Dropdown(id=IDs.brands_dd,
+                                              options=['All', 'Augmentin', 'Clamoxyl', 'Ventoline', 'Flixotide',
+                                                       'Seretide'],
+                                              value='All',
+                                              clearable=False,
+                                              searchable=True,
+                                              ),
+                                 html.Hr(),
+                                 html.Br(),
+                                 html.Label('Periods:',
+                                            style={Naming.text_deco: Naming.underline,
+                                                   Naming.font_weight: Naming.bold,
+                                                   Naming.color: 'grey',
+                                                   },
+                                            ),
+                                 dcc.RadioItems(id=IDs.periods_rb,
+                                                options=[{'label': 'Months', 'value': 'MONTHLY'},
+                                                         {'label': 'Weeks', 'value': 'WEEKLY'},
+                                                         {'label': 'Days', 'value': 'DTD'},
+                                                         {'label': 'Quarters', 'value': 'QTD'},
+                                                         {'label': 'Halfs', 'value': 'STD'},
+                                                         {'label': 'Year', 'value': 'YTD'},
+                                                         ],
+                                                value='MONTHLY',
+                                                ),
+                                 html.Br(),
+                                 html.Label('Selected period: MTD'),
+                                 dcc.Dropdown(id=IDs.periods_dd,
+                                              options=['Period 1', 'Period 2', 'Period 3'],
+                                              value='Period 1',
+                                              clearable=False,
+                                              searchable=True,
+                                              ),
+                                 html.Hr(),
+                                 html.Br(),
+                                 html.Button(id=IDs.show_b,
+                                             style={'background': '#64B5F6'},
+                                             children=['Afficher'],
+                                             n_clicks=0),
+                                 ],
+                       )
+    return nav_bar
+
+
 def load():
     gsk_div()
 
@@ -156,21 +240,74 @@ load()
 app = Dash(__name__)
 
 app.layout = html.Div(id=IDs.dashboard,
+                      style={Naming.display: Naming.flex,
+                             Naming.flex_direction: Naming.flex_col,
+                             Naming.border: '1px solid black',
+                             Naming.padding: '10px',
+                             },
                       children=[html.Div('Dashboard',
                                          style={'color': '#fc7b03',
                                                 Naming.height: '10%',
                                                 Naming.border: '1px solid black',
                                                 },
                                          ),
+                                html.Hr(),
+                                html.Br(),
+                                html.Div(title='All periods Overall achievements',
+                                         id=IDs.all_periods_overall_achievements,
+                                         style={Naming.display: Naming.flex,
+                                                Naming.flex_direction: Naming.flex_row,
+                                                Naming.height: '30%',
+                                                },
+                                         children=[html.Div(title='GSK Month',
+                                                            id=IDs.gsk_month_indic,
+                                                            style={Naming.width: '25%',
+                                                                   },
+                                                            children=[html.Label('Month Achievements',
+                                                                                 ),
+                                                                      ]
+                                                            ),
+                                                   html.Hr(),
+                                                   html.Div(title='GSK Quarter',
+                                                            id=IDs.gsk_quarter_indic,
+                                                            style={Naming.width: '25%',
+                                                                   },
+                                                            children=[html.Label('Quarter Achievements',
+                                                                                 ),
+                                                                      ]
+                                                            ),
+                                                   html.Hr(),
+                                                   html.Div(title='GSK Half',
+                                                            id=IDs.gsk_half_indic,
+                                                            style={Naming.width: '25%',
+                                                                   },
+                                                            children=[html.Label('Half year Achievements',
+                                                                                 ),
+                                                                      ]
+                                                            ),
+                                                   html.Hr(),
+                                                   html.Div(title='GSK Year',
+                                                            id=IDs.gsk_year_indic,
+                                                            style={Naming.width: '25%',
+                                                                   },
+                                                            children=[html.Label('Year Achievements',
+                                                                                 ),
+                                                                      ]
+                                                            ),
+                                                   ]
+                                         ),
+                                html.Hr(),
+                                html.Br(),
                                 html.Div(style={Naming.display: Naming.flex,
                                                 Naming.flex_direction: Naming.flex_row,
-                                                Naming.height: '90%'
+                                                Naming.height: '60%'
                                                 },
-                                         children=[html.Nav(title='Parameters',
+                                         children=[html.Div(title='Parameters',
                                                             id=IDs.parameters,
                                                             style={Naming.width: '15%',
                                                                    },
                                                             children=[html.H3('Parameters'),
+                                                                      nav_bar(),
                                                                       ],
                                                             ),
                                                    html.Hr(),
@@ -185,11 +322,6 @@ app.layout = html.Div(id=IDs.dashboard,
                                                    ],
                                          ),
                                 ],
-                      style={Naming.display: Naming.flex,
-                             Naming.flex_direction: Naming.flex_col,
-                             Naming.border: '1px solid black',
-                             Naming.padding: '10px',
-                             },
                       )
 
 app.run_server(debug=True)
