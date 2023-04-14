@@ -1,7 +1,134 @@
 from datetime import datetime
 
 import pandas as pnd
+import plotly.graph_objects as go
 from dash import html, Dash, dcc
+
+import parametres.src.name_space as nm
+
+
+class SalesAs:
+    value: str = 'Value'
+    volume: str = 'Volume'
+
+    def __init__(self, sales_as: str):
+        self.sales_as: str = sales_as
+        self.rfc: str
+        self.achieved: str
+        self._set_properties()
+
+    def _set_properties(self):
+        if self.sales_as == SalesAs.volume:
+            self.rfc = nm.GSK.ColName.RFC_UNIT_COL
+            self.achieved = nm.GSK.ColName.UNIT_SALES
+        elif self.sales_as == SalesAs.value:
+            self.rfc = nm.GSK.ColName.RFC_VALUE_COL
+            self.achieved = nm.GSK.ColName.VALUE_SALES
+        else:
+            raise Exception('Sales as error')
+
+
+sales_as_vol: SalesAs = SalesAs(SalesAs.volume)
+sales_as_val: SalesAs = SalesAs(SalesAs.value)
+
+
+class GskGraph:
+    sales = pnd.read_excel('/home/nazim/Dev Projects/Dash Board/GSK Sales/output/GSK SALES.xlsx', sheet_name=None)
+    update_date = pnd.to_datetime(sales['2023'][nm.GSK.ColName.UPDATED_ON].values[0])
+    sales_as: [str, dict[str, str]] = dict(
+        volume=dict(actual=nm.GSK.ColName.UNIT_SALES, target=nm.GSK.ColName.RFC_UNIT_COL),
+        value=dict(actual=nm.GSK.ColName.VALUE_SALES, target=nm.GSK.ColName.RFC_VALUE_COL))
+
+    @staticmethod
+    def rfc(sales_as: str) -> dict[str:float]:
+        pass
+
+    @staticmethod
+    def achieved(sales_as: str, sku: str, period_type: str, date: pnd.Timestamp) -> dict[str, float]:
+        achievements: dict[str, float] = {}
+
+        return achievements
+
+    @staticmethod
+    def achievement(sales_as: str, sku: str, period_type: str, date: pnd.Timestamp) -> dict[str, float]:
+        data_n: pnd.DataFrame = GskGraph.sales['2023']
+        data_n_1: pnd.DataFrame = GskGraph.sales['2022']
+        actual_n: float
+        target_n: float
+        actual_n_1: float
+        timestamp = pnd.to_datetime(date)
+        data = data_n[data_n[nm.GSK.ColName.PERIOD_TYPE] == period_type]
+        data = data[data[nm.GSK.ColName.DATE] == timestamp]
+        data = data[data[nm.GSK.ColName.SKU] == sku]
+        target_n = data[GskGraph.sales_as[sales_as]['target']].values[0]
+        actual_n = data[GskGraph.sales_as[sales_as]['actual']].values[0]
+
+        data = data_n_1[data_n_1[nm.GSK.ColName.PERIOD_TYPE] == period_type]
+        data = data[data[nm.GSK.ColName.DATE] == timestamp]
+        data = data[data[nm.GSK.ColName.SKU] == sku]
+        if data.empty:
+            actual_n_1 = 0
+        else:
+            actual_n_1 = data[GskGraph.sales_as[sales_as]['actual']].values[0]
+        return {'actual': actual_n, 'target': target_n, 'past actual': actual_n_1}
+
+    @staticmethod
+    def get_delta_color(progression: float) -> str:
+        default_red_color: str = '#FF4136'
+        default_green_color: str = '#3D9970'
+        dark_green_color: str = '#033301'
+        dark_red_color: str = '#690902'
+        orange_color: str = '#db9f07'
+        blue_color: str = '#2370c2'
+        if progression < .20:
+            return dark_red_color
+        elif progression < .45:
+            return default_red_color
+        elif progression < .85:
+            return orange_color
+        elif progression < .95:
+            return default_green_color
+        elif progression < 1.1:
+            return dark_green_color
+        else:
+            return blue_color
+
+    @staticmethod
+    def indicator(sales_as: str, sku: str, period_type: str, date: pnd.Timestamp) -> go.Figure:
+        values_dict = GskGraph.achievement(sales_as, sku, period_type, date)
+        target: float = values_dict['target']
+        actual: float = values_dict['actual']
+        past_actual: float = values_dict['past actual']
+        margin: float = .15
+        gauge_range = sorted([target, actual, past_actual])[-1] * 1.1
+        # progress_over_time = progression_over_time_mile_stone(actual_progress=actual,
+        #                                                       target_progress=target, )
+        fig = go.Figure()
+        fig.add_trace(go.Indicator(
+            mode="number+gauge+delta", value=actual,
+            domain={'x': [0, 1], 'y': [0.5, 1]},
+            delta={'reference': target, 'position': "top"},
+            title={'text': f"<b>Achievement</b><br><span style='color: gray; font-size:0.8em'>{sales_as}</span>",
+                   'font': {"size": 14}},
+            gauge={
+                'axis': {'range': [None, gauge_range]},
+                'threshold': {
+                    'line': {'color': "red", 'width': 2},
+                    'thickness': 1, 'value': target},
+
+                'bgcolor': "white",
+                'steps': [
+                    {'range': [0, past_actual], 'color': "turquoise"}],
+                'bar': {'color': "#eb7d34"}}))
+
+        fig.add_trace(go.Indicator(
+            mode='delta',
+            value=(actual + target) / target * 100,
+            delta={'reference': 100, 'suffix': '%',
+                   'increasing': {'color': GskGraph.get_delta_color(.9)}},
+            domain={'x': [0.25, .75], 'y': [0.2, 0.5]}
+        ))
+        return fig
 
 
 class PeriodsDates:
@@ -46,6 +173,14 @@ class Naming:
 
 
 class IDs:
+    sub_brand_indicator = 'sub_brand_indicator_graph_id'
+    sub_overall_indicator = 'sub_overall_indicator_graph_id'
+    sunburst_graph = 'sunburst_graph_id'
+    funnel_graph = 'funnel_graph_id'
+    graph_overall_year_indicator = 'graph_indicator_overall_year_id'
+    graph_overall_quarter_indicator = 'graph_indicator_overall_quarter_id'
+    graph_overall_half_indicator = 'graph_indicator_overall_half_id'
+    graph_overall_month_indicator = 'graph_indicator_overall_month_id'
     vol_val_rb = 'vol_val_id'
     gsk_year_indic = 'gsk_year_indicator_id'
     gsk_half_indic = 'gsk_half_indicator_id'
@@ -105,6 +240,7 @@ def gsk_div():
                                                                           Naming.width: '50%',
                                                                           },
                                                                    children=[html.Label('Overall Achievements'),
+                                                                             dcc.Graph(id=IDs.sub_overall_indicator),
                                                                              ],
                                                                    ),
                                                           html.Hr(),
@@ -131,6 +267,7 @@ def gsk_div():
                                                                    style={Naming.width: '50%',
                                                                           },
                                                                    children=[html.Label('Funnel Graph'),
+                                                                             dcc.Graph(id=IDs.funnel_graph),
                                                                              ],
                                                                    ),
                                                           html.Hr(),
@@ -139,6 +276,7 @@ def gsk_div():
                                                                    style={Naming.width: '50%',
                                                                           },
                                                                    children=[html.Label('Sunburst Graph'),
+                                                                             dcc.Graph(id=IDs.sunburst_graph),
                                                                              ],
                                                                    ),
                                                           ],
@@ -248,7 +386,7 @@ def dash_structure() -> html.Div:
                               html.Br(),
                               dcc.RadioItems(id=IDs.vol_val_rb,
                                              style={},
-                                             options=[{'label': 'Valeur', 'value': 'GBP'},
+                                             options=[{'label': 'Value', 'value': 'GBP'},
                                                       {'label': 'Volume', 'value': 'units'},
                                                       ],
                                              ),
@@ -259,41 +397,35 @@ def dash_structure() -> html.Div:
                                               Naming.flex_direction: Naming.flex_row,
                                               Naming.height: '30%',
                                               },
-                                       children=[html.Div(title='GSK Month',
-                                                          id=IDs.gsk_month_indic,
-                                                          style={Naming.width: '25%',
-                                                                 },
-                                                          children=[html.Label('Month Achievements',
-                                                                               ),
-                                                                    ]
-                                                          ),
+                                       children=[html.Label('Month Achievements',
+                                                            ),
+                                                 dcc.Graph(id=IDs.graph_overall_month_indicator,
+                                                           style={Naming.width: '25%',
+                                                                  Naming.height: '100%',
+                                                                  Naming.padding: '10px',
+                                                                  },
+                                                           ),
                                                  html.Hr(),
-                                                 html.Div(title='GSK Quarter',
-                                                          id=IDs.gsk_quarter_indic,
-                                                          style={Naming.width: '25%',
-                                                                 },
-                                                          children=[html.Label('Quarter Achievements',
-                                                                               ),
-                                                                    ]
-                                                          ),
+                                                 dcc.Graph(id=IDs.graph_overall_quarter_indicator,
+                                                           style={Naming.width: '25%',
+                                                                  Naming.height: '100%',
+                                                                  Naming.padding: '10px',
+                                                                  },
+                                                           ),
                                                  html.Hr(),
-                                                 html.Div(title='GSK Half',
-                                                          id=IDs.gsk_half_indic,
-                                                          style={Naming.width: '25%',
-                                                                 },
-                                                          children=[html.Label('Half year Achievements',
-                                                                               ),
-                                                                    ]
-                                                          ),
+                                                 dcc.Graph(id=IDs.graph_overall_half_indicator,
+                                                           style={Naming.width: '25%',
+                                                                  Naming.height: '100%',
+                                                                  Naming.padding: '10px',
+                                                                  },
+                                                           ),
                                                  html.Hr(),
-                                                 html.Div(title='GSK Year',
-                                                          id=IDs.gsk_year_indic,
-                                                          style={Naming.width: '25%',
-                                                                 },
-                                                          children=[html.Label('Year Achievements',
-                                                                               ),
-                                                                    ]
-                                                          ),
+                                                 dcc.Graph(id=IDs.graph_overall_year_indicator,
+                                                           style={Naming.width: '25%',
+                                                                  Naming.height: '100%',
+                                                                  Naming.padding: '10px',
+                                                                  },
+                                                           ),
                                                  ]
                                        ),
                               html.Hr(),
