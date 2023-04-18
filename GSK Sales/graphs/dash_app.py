@@ -67,14 +67,24 @@ class GskData:
     update_date = pnd.to_datetime(sales['2023'][nm.GSK.ColName.UPDATED_ON].values[0])
 
     @staticmethod
-    def achievements(sales_as: SalesAs, sku: str, period_type: str, date: pnd.Timestamp) -> dict[str, dict[str, float]]:
-        achievements: dict[str, dict[str, float]] = {}
-        for year, sales_df in GskData.sales.items():
-            data_df = sales_df[
-                (sales_df[nm.GSK.ColName.PERIOD_TYPE] == period_type) & (sales_df[nm.GSK.ColName.SKU] == sku) & (
-                        sales_df[nm.GSK.ColName.DATE] == date)]
-            achievements.update({year: {GskData.actual: data_df[sales_as.achieved],
-                                        GskData.target: data_df[sales_as.rfc]}})
+    def achievements(sales_df: pnd.DataFrame, sales_as: SalesAs, sku: str, period_type: str, date: pnd.Timestamp) -> \
+            dict[str, float]:
+        achievements: dict[str, float] = {}
+        data_df = sales_df[sales_df[nm.GSK.ColName.PERIOD_TYPE] == period_type]
+        data_df = data_df[data_df[nm.GSK.ColName.SKU] == sku]
+        data_df[nm.GSK.ColName.DATE] = pnd.to_datetime(data_df[nm.GSK.ColName.DATE])
+        data_df = data_df[data_df[nm.GSK.ColName.DATE] == date]
+        if data_df.empty:
+            achievements.update({GskData.actual: 0,
+                                 GskData.target: 0,
+                                 },
+                                )
+            return achievements
+
+        achievements.update({GskData.actual: data_df[sales_as.achieved].values[0],
+                             GskData.target: data_df[sales_as.rfc].values[0],
+                             },
+                            )
         return achievements
 
     @staticmethod
@@ -222,7 +232,7 @@ class GskGraph:
                 'bar': {'color': '#10BA4D'}}))
         fig.add_trace(go.Indicator(
             mode='delta',
-            value=(achieved + target) / target * 100,
+            value=((achieved + target) / target * 100) if target != 0 else 0,
             delta={'reference': 100, 'suffix': '%',
                    'increasing': {'color': GskGraph.get_delta_color(.9)}},
             domain={'x': [0.25, .75], 'y': [0.2, 0.5]}
@@ -235,15 +245,32 @@ class GskGraph:
         figures: list[go.Figure] = []
         period_types = ['MTD', 'QTR', 'STD', 'YTD']
         sku = nm.GSK.Naming.ALL_SKUs
-        sales_23 = GskData.actual_sales()
+        actual_sales_df = GskData.actual_sales()
+        ly_sales_df = GskData.ly_sales()
+        ly_date: pnd.Timestamp
         for period_type in period_types:
-            date = sales_23[sales_23[nm.GSK.ColName.PERIOD_TYPE == period_type]][nm.GSK.ColName.DATE].max()
-            data_dict = GskData.achievements(sale_as, sku, period_type, date)
-            target: float = data_dict[GskData.actual_year][GskData.target]
-            achieved: float = data_dict[GskData.actual_year][GskData.actual]
-            ly_achieved: float = data_dict[GskData.actual_year][GskData.actual]
+            date = actual_sales_df[actual_sales_df[nm.GSK.ColName.PERIOD_TYPE] == period_type][
+                nm.GSK.ColName.DATE].max()
+            if period_type == 'MTD':
+                ly_date = date + pnd.offsets.MonthEnd(0)
+            elif period_type == 'QTR':
+                ly_date = date + pnd.offsets.QuarterEnd(0)
+            elif period_type == 'STD':
+                ly_date = pnd.Timestamp(year=date.year - 1, month=6, day=30,
+                                        hour=16) if date.quarter < 3 else pnd.Timestamp(year=date.year - 1, month=12,
+                                                                                        day=31, hour=16)
+                print()
+            elif period_type == 'YTD':
+                ly_date = date + pnd.offsets.YearEnd(0)
+            else:
+                raise ValueError()
+            actual_data_dict = GskData.achievements(actual_sales_df, sale_as, sku, period_type, date)
+            target: float = actual_data_dict[GskData.target]
+            achieved: float = actual_data_dict[GskData.actual]
+            ly_data_dict = GskData.achievements(ly_sales_df, sale_as, sku, period_type, ly_date)
+            ly_achieved: float = ly_data_dict[GskData.actual]
 
-            figures.append(GskGraph.indicator(achieved, target, ly_achieved, sale_as, (period_type + 'Achievements')))
+            figures.append(GskGraph.indicator(achieved, target, ly_achieved, sale_as, (period_type + ' Achievements')))
 
         return figures[0], figures[1], figures[2], figures[3]
 
@@ -481,8 +508,11 @@ app.layout = DashBoard.dash_structure()
 )
 def update_indicators(value):
     return GskGraph.overall_indicators(value)
+    # return GskGraph.indicator(20, 100, 97, sales_as_vol, 'Month Achievements'), \
+    #     GskGraph.indicator(20, 280, 270, sales_as_vol, 'Quarter Achievements'), \
+    #     GskGraph.indicator(20, 600, 595, sales_as_vol, 'Semester Achievements'), \
+    #     GskGraph.indicator(20, 1100, 1000, sales_as_vol, 'Year Achievements')
 
 
-app.run_server(debug=True)
-
-# GskGraph.indicator(15, 57, 55, sales_as_vol).show()
+# app.run_server(debug=True)
+update_indicators('Volume')
