@@ -1,5 +1,4 @@
 import pandas as pnd
-
 import gsk_sales as sls
 from parametres.src import name_space as nm
 from parametres.src.parameters import Parameters as Params

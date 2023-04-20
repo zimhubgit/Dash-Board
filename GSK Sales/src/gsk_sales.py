@@ -310,7 +310,7 @@ class GskSales:
     def _10_set_semester_sales_df(self):
         monthly_sales_df: pnd.DataFrame = self.gsk_dataset_df[
             self.gsk_dataset_df[GSK.ColName.PERIOD_TYPE] == GSK.Naming.PERIOD_TYPE_MONTHLY].copy()
-        semester_sales_df = monthly_sales_df.groupby(GSK.ColName.SKU).resample(rule='2Q', on=GSK.ColName.DATE)[
+        semester_sales_df = monthly_sales_df.groupby([GSK.ColName.SKU, pnd.Grouper(key=GSK.ColName.DATE, freq='6M')])[
             Params.MAPPER_COLUMN_ACTION_UPON.get(GSK.Naming.QUARTER_SUM)].sum().reset_index()
         semester_sales_df[GSK.ColName.DATE] = semester_sales_df[GSK.ColName.DATE].apply(
             lambda dt: dt.replace(hour=Params.SALES_DATA_HOUR))
