@@ -310,16 +310,31 @@ class GskSales:
     def _10_set_semester_sales_df(self):
         monthly_sales_df: pnd.DataFrame = self.gsk_dataset_df[
             self.gsk_dataset_df[GSK.ColName.PERIOD_TYPE] == GSK.Naming.PERIOD_TYPE_MONTHLY].copy()
-        semester_sales_df = monthly_sales_df.groupby([GSK.ColName.SKU, pnd.Grouper(key=GSK.ColName.DATE, freq='6M')])[
-            Params.MAPPER_COLUMN_ACTION_UPON.get(GSK.Naming.QUARTER_SUM)].sum().reset_index()
-        semester_sales_df[GSK.ColName.DATE] = semester_sales_df[GSK.ColName.DATE].apply(
-            lambda dt: dt.replace(hour=Params.SALES_DATA_HOUR))
-        semester_sales_df = pnd.merge(semester_sales_df,
+        hy1_sales_df = monthly_sales_df[monthly_sales_df[GSK.ColName.DATE].dt.month.isin(list(range(1, 7)))]
+        if not hy1_sales_df.empty:
+            hy1_sales_df = hy1_sales_df.groupby(GSK.ColName.SKU)[
+                Params.MAPPER_COLUMN_ACTION_UPON.get(GSK.Naming.QUARTER_SUM)].sum().reset_index()
+            hy1_sales_df[GSK.ColName.PERIOD_TYPE] = GSK.Naming.PERIOD_TYPE_STD
+            hy1_sales_df[GSK.ColName.DATE] = pnd.Timestamp(year=monthly_sales_df[GSK.ColName.DATE].dt.year.values[0],
+                                                           month=6,
+                                                           day=30, hour=16)
+
+        hy2_sales_df = monthly_sales_df[monthly_sales_df[GSK.ColName.DATE].dt.month.isin(list(range(7, 13)))]
+        if not hy2_sales_df.empty:
+            hy2_sales_df = hy2_sales_df.groupby(GSK.ColName.SKU)[
+                Params.MAPPER_COLUMN_ACTION_UPON.get(GSK.Naming.QUARTER_SUM)].sum().reset_index()
+            hy2_sales_df[GSK.ColName.PERIOD_TYPE] = GSK.Naming.PERIOD_TYPE_STD
+            hy2_sales_df[GSK.ColName.DATE] = pnd.Timestamp(year=monthly_sales_df[GSK.ColName.DATE].dt.year.values[0],
+                                                           month=12,
+                                                           day=31, hour=16)
+
+        half_years_df = pnd.concat([hy1_sales_df, hy2_sales_df])
+        semester_sales_df = pnd.merge(half_years_df,
                                       monthly_sales_df[[GSK.ColName.DATE, GSK.ColName.SKU, GSK.ColName.NSP]],
                                       on=[GSK.ColName.DATE, GSK.ColName.SKU],
                                       how='left')
-        semester_sales_df[GSK.ColName.PERIOD_TYPE] = GSK.Naming.PERIOD_TYPE_STD
-        self.gsk_dataset_df = pnd.concat([self.gsk_dataset_df, semester_sales_df])
+
+        self.gsk_dataset_df = pnd.concat([self.gsk_dataset_df, half_years_df])
 
     def _11_set_year_sales_df(self):
         monthly_sales_df: pnd.DataFrame = self.gsk_dataset_df[
