@@ -23,3 +23,4 @@ class NameMap:
     color = 'color'
     bg_color = 'backgroundColor'
     solid_gsk_orange = rgba(243, 102, 51)
+    opacity = 'opacity'
