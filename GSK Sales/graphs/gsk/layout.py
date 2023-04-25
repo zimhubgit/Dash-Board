@@ -12,6 +12,10 @@ class IDs:
     std_sales_indicator = 'std_sales_indicator_id'
     ytd_sales_indicator = 'ytd_sales_indicator_id'
 
+    sales_repartition_sect = 'sales_repartition_sect_id'
+    sales_repartition_sunburst = 'sales_repartition_sunburst_id'
+    sales_repartition_waterfall = 'sales_repartition_waterfall_id'
+
     radio = 'radio_id'
 
 
@@ -29,7 +33,10 @@ class Section:
                                                        nm.flex_direction: nm.flex_col,
                                                        },
                                                 children=[Section.__1_sect_header(),
-                                                          Section.__2_sect_progress()
+                                                          html.Hr(),
+                                                          Section.__2_sect_progress(),
+                                                          html.Hr(),
+                                                          Section.__3_sect_progress_dist(),
                                                           ]
                                                 )
         return assembled_sections
@@ -61,36 +68,39 @@ class Section:
                                   html.Div(title='Overall achievements',
                                            id=IDs.sales_indicator_sect,
                                            style={nm.border: '1px solid black',
-                                                  nm.width: '100%',
+                                                  nm.height: '10%',
                                                   nm.display: nm.flex,
                                                   nm.disposition: nm.flex_row
                                                   },
                                            children=[html.Div(style={nm.opacity: '1',
-                                                                     nm.bg_color: nm.rgba(39, 132, 245, 0.7),
+                                                                     nm.bg_color: nm.rgba(39, 132, 245, 0.4),
                                                                      nm.width: '25%',
                                                                      nm.padding: '10px',
                                                                      },
                                                               children=[dcc.Graph(id=IDs.mtd_sales_indicator),
                                                                         ],
                                                               ),
+                                                     html.Hr(),
                                                      html.Div(style={nm.opacity: '1',
-                                                                     nm.bg_color: nm.rgba(39, 132, 245, 0.7),
+                                                                     nm.bg_color: nm.rgba(39, 132, 245, 0.4),
                                                                      nm.width: '25%',
                                                                      nm.padding: '10px',
                                                                      },
                                                               children=[dcc.Graph(id=IDs.qtd_sales_indicator),
                                                                         ],
                                                               ),
+                                                     html.Hr(),
                                                      html.Div(style={nm.opacity: '1',
-                                                                     nm.bg_color: nm.rgba(39, 132, 245, 0.7),
+                                                                     nm.bg_color: nm.rgba(39, 132, 245, 0.4),
                                                                      nm.width: '25%',
                                                                      nm.padding: '10px',
                                                                      },
                                                               children=[dcc.Graph(id=IDs.std_sales_indicator),
                                                                         ],
                                                               ),
+                                                     html.Hr(),
                                                      html.Div(style={nm.opacity: '1',
-                                                                     nm.bg_color: nm.rgba(39, 132, 245, 0.7),
+                                                                     nm.bg_color: nm.rgba(39, 132, 245, 0.4),
                                                                      nm.width: '25%',
                                                                      nm.padding: '10px',
                                                                      },
@@ -104,15 +114,48 @@ class Section:
 
     @staticmethod
     def __3_sect_progress_dist() -> html.Div:
-        pass
+        return html.Div(style={nm.height: '25%',
+                               nm.border: '1px solid black',
+                               },
+                        children=[html.H4('Sales distribution',
+                                          style={nm.height: '15%'},
+                                          ),
+                                  html.Div(id=IDs.sales_repartition_sect,
+                                           style={nm.border: '1px solid black',
+                                                  nm.height: '10%',
+                                                  nm.display: nm.flex,
+                                                  nm.disposition: nm.flex_row},
+                                           children=[html.Div(style={nm.opacity: '1',
+                                                                     nm.bg_color: nm.rgba(39, 132, 245, 0.4),
+                                                                     nm.width: '50%',
+                                                                     nm.padding: '10px',
+                                                                     },
+                                                              children=[dcc.Graph(id=IDs.sales_repartition_sunburst),
+                                                                        ],
+                                                              ),
+                                                     html.Hr(),
+                                                     html.Div(style={nm.opacity: '1',
+                                                                     nm.bg_color: nm.rgba(39, 132, 245, 0.4),
+                                                                     nm.width: '50%',
+                                                                     nm.padding: '10px',
+                                                                     },
+                                                              children=[dcc.Graph(id=IDs.sales_repartition_waterfall),
+                                                                        ],
+                                                              )
+                                                     ],
+                                           ),
+                                  ],
+                        )
 
-    @staticmethod
-    def __4_sect_progress_hist() -> html.Div:
-        pass
 
-    @staticmethod
-    def __5_sect_stock_hist() -> html.Div:
-        pass
+@staticmethod
+def __4_sect_progress_hist() -> html.Div:
+    pass
+
+
+@staticmethod
+def __5_sect_stock_hist() -> html.Div:
+    pass
 
 
 class Update:
@@ -120,3 +163,11 @@ class Update:
     def update_progress_section(sales_as: d.SalesAs) -> go.Figure:
         return fig.indicator(achieved=11000, target=26000, label='MTD Progress', sales_as=d.SalesAs(d.SalesAs.volume),
                              ly_achieved=25000)
+
+    @staticmethod
+    def update_sunburst_section(sales_as: d.SalesAs) -> go.Figure:
+        return fig.sunburst()
+
+    @staticmethod
+    def update_waterfall_section(sales_as: d.SalesAs) -> go.Figure:
+        return fig.water_fall()

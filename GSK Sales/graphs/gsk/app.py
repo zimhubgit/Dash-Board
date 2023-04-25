@@ -11,14 +11,18 @@ app.layout = layout.Dash.get()
     Output(layout.IDs.qtd_sales_indicator, 'figure'),
     Output(layout.IDs.std_sales_indicator, 'figure'),
     Output(layout.IDs.ytd_sales_indicator, 'figure'),
+    Output(layout.IDs.sales_repartition_sunburst, 'figure'),
+    Output(layout.IDs.sales_repartition_waterfall, 'figure'),
     Input(layout.IDs.radio, 'value'),
 )
 def update(value):
-    print('im here')
-    return (layout.Update.update_progress_section(d.SalesAs(d.SalesAs.volume)),
-            layout.Update.update_progress_section(d.SalesAs(d.SalesAs.volume)),
-            layout.Update.update_progress_section(d.SalesAs(d.SalesAs.volume)),
-            layout.Update.update_progress_section(d.SalesAs(d.SalesAs.volume)))
+    sales_as = d.SalesAs(d.SalesAs.volume)
+    return (layout.Update.update_progress_section(sales_as),
+            layout.Update.update_progress_section(sales_as),
+            layout.Update.update_progress_section(sales_as),
+            layout.Update.update_progress_section(sales_as),
+            layout.Update.update_sunburst_section(sales_as),
+            layout.Update.update_waterfall_section(sales_as))
 
 
 app.run_server(debug=True)

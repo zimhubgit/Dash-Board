@@ -32,3 +32,33 @@ def indicator(achieved: float, target: float, ly_achieved: float, label: str,
         domain={'x': [0.25, .75], 'y': [0.2, 0.5]}
     ))
     return fig
+
+
+def sunburst() -> go.Figure:
+    fig = go.Figure()
+    fig.add_trace(go.Sunburst(
+        values=[1000, 2000, 3000, 6000],
+        labels=['Augmentin', 'Clamoxyl', 'Ventoline', 'Flixotide'],
+        parents=['', '', '', ''],
+        branchvalues='total',
+        insidetextorientation='radial',
+    ))
+
+    return fig
+
+
+def water_fall() -> go.Figure:
+    fig = go.Figure(go.Waterfall(
+        name="20", orientation="v",
+        measure=["relative", "relative", "relative", "relative", "total"],
+        x=["Augmentin", "Clamoxyl", "Ventoline", "Flixotide", 'Total'],
+        textposition="outside",
+        text=["1000", "2000", "3000", "6000", "Total"],
+        y=[1000, 2000, 3000, 6000, 0],
+        connector={"line": {"color": "rgb(63, 63, 63)"}},
+    ))
+
+    fig.update_layout(
+        # showlegend=True
+    )
+    return fig
