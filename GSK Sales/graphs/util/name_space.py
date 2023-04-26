@@ -3,6 +3,10 @@ class NameMap:
     def rgba(r: int, g: int, b: int, opacity: float = 1):
         return f'rgba({r},{g},{b},{opacity})'
 
+    @staticmethod
+    def gsk_orange(opacity: float = 0.7):
+        return NameMap.rgba(243, 102, 51, opacity)
+
     children_num = 'NUMBER OF CHILDREN'
     disposition = 'DISPOSITION'
     orientation = 'ORIENTATION'
@@ -24,3 +28,7 @@ class NameMap:
     bg_color = 'backgroundColor'
     solid_gsk_orange = rgba(243, 102, 51)
     opacity = 'opacity'
+    border_radius = 'border-radius'
+    bg_color_fig = 'background-color'
+    shadow = 'box-shadow'
+    defautl_shadow = '10px 10px 10px lightgrey'

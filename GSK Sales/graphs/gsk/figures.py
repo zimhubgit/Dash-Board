@@ -1,5 +1,7 @@
 import plotly.graph_objects as go
+import plotly.express as px
 import data
+import pandas as pnd
 import name_space as nm
 
 
@@ -25,6 +27,15 @@ def indicator(achieved: float, target: float, ly_achieved: float, label: str,
             'steps': [
                 {'range': [0, ly_achieved], 'color': '#DDDDDD'}],
             'bar': {'color': '#10BA4D'}}))
+    fig.add_shape(type='line',
+                  x0=.1,
+                  y0=.4,
+                  x1=.9,
+                  y1=.4,
+                  line=dict(
+                      color="grey",
+                      width=2,
+                  ))
     fig.add_trace(go.Indicator(
         mode='delta',
         value=((achieved + target) / target * 100) if target != 0 else 0,
@@ -32,11 +43,12 @@ def indicator(achieved: float, target: float, ly_achieved: float, label: str,
                'increasing': {'color': data.get_delta_color(.9)}},
         domain={'x': [0.25, .75], 'y': [0, 0.5]}
     ))
+    fig.update_layout(paper_bgcolor='rgba(0,0,0,0)')
     return fig
 
 
 def sunburst() -> go.Figure:
-    fig = go.Figure()
+    fig = color_map_sunburst()
     fig.add_trace(go.Sunburst(
         values=[1000, 2000, 3000, 6000],
         labels=['Augmentin', 'Clamoxyl', 'Ventoline', 'Flixotide'],
@@ -44,33 +56,32 @@ def sunburst() -> go.Figure:
         branchvalues='total',
         insidetextorientation='radial',
     ))
-    fig.update_layout(
-        updatemenus=[
-            dict(
-                type="buttons",
-                direction="left",
-                buttons=list([
-                    dict(
-                        args=["type", "sunburst"],
-                        label="Repartition",
-                        method="restyle"
-                    ),
-                    dict(
-                        args=["type", "sunburst"],
-                        label="Heatmap",
-                        method="restyle"
-                    )
-                ]),
-                pad={"r": 10, "t": 10},
-                showactive=True,
-                x=0.11,
-                xanchor="left",
-                y=1.1,
-                yanchor="top"
-            ),
-        ]
-    )
+    fig.layout.update(
+        updatemenus=[go.layout.Updatemenu(
+            type="buttons", direction="right", active=1, x=0.5, y=1.2,
+            buttons=list([dict(label="Heatmap", method="update",
+                               args=[{"visible": [True, False]}, {"title": "Heatmap"}]),
+                          dict(label="Repartition", method="update",
+                               args=[{"visible": [False, True]}, {"title": "Repartition"}])]))])
 
+    fig.update_layout(paper_bgcolor='rgba(0,0,0,0)')
+    return fig
+
+
+def color_map_sunburst() -> go.Figure:
+    actuals = [1000, 2000, 3000, 6000]
+    rfc = [1200, 3000, 2000, 6500]
+    progress = [(r / rfc[i] * 100) for i, r in enumerate(actuals)]
+    sunburst_df: pnd.DataFrame = pnd.DataFrame(data={'SKU': ['Augmentin', 'Clamoxyl', 'Ventoline', 'Flixotide'],
+                                                     'SALES VALUE(GBP)': actuals,
+                                                     'RFC UNIT': rfc,
+                                                     'REALISATIONS': progress})
+    fig = px.sunburst(sunburst_df, path=['SKU'],
+                      values='SALES VALUE(GBP)', color='REALISATIONS',
+                      color_continuous_scale='rdylgn',
+                      range_color=[0, 100])
+    fig.update_traces({'insidetextorientation': 'radial'})
+    fig.update_layout(paper_bgcolor='rgba(0,0,0,0)')
     return fig
 
 
@@ -88,6 +99,7 @@ def water_fall() -> go.Figure:
     fig.update_layout(
         # showlegend=True
     )
+    fig.update_layout(paper_bgcolor='rgba(0,0,0,0)')
     return fig
 
 
@@ -110,7 +122,8 @@ def stocks_hist_bar() -> go.Figure:
     ))
 
     # Here we modify the tickangle of the xaxis, resulting in rotated labels.
-    fig.update_layout(barmode='overlay', xaxis_tickangle=-45)
+    fig.update_layout(barmode='overlay', xaxis_tickangle=-45, paper_bgcolor='rgba(0,0,0,0)')
+    fig.update_layout(paper_bgcolor='rgba(0,0,0,0)')
     return fig
 
 
@@ -141,13 +154,14 @@ def sales_hist_bar() -> go.Figure:
                           width=2,
                       ),
                       )
+        growth = (actuals[idx] - ly_actuals[idx]) / ly_actuals[idx]
         fig.add_shape(type="rect",
-                      xref='x', yref='y', fillcolor='lightblue',
+                      xref='x', yref='y', fillcolor='seagreen' if growth > 0.03 else 'red',
                       x0=idx - .9 / 2,
                       y0=1,
                       x1=idx + .9 / 2,
                       y1=5,
-                      label=dict(text=f"G:\n{(actuals[idx] - ly_actuals[idx]) / ly_actuals[idx]:.2f}"))
+                      label=dict(text=f"G:\n{growth:.2f}"), )
     fig.add_trace(go.Bar(
         x=months,
         y=ly_actuals,
@@ -157,4 +171,5 @@ def sales_hist_bar() -> go.Figure:
 
     # Here we modify the tickangle of the xaxis, resulting in rotated labels.
     fig.update_layout(barmode='group', xaxis_tickangle=-45)
+    fig.update_layout(paper_bgcolor='rgba(0,0,0,0)')
     return fig
