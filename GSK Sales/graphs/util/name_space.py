@@ -1,6 +1,6 @@
 class NameMap:
     @staticmethod
-    def rgba(r: int, g: int, b: int, opacity: int = 1):
+    def rgba(r: int, g: int, b: int, opacity: float = 1):
         return f'rgba({r},{g},{b},{opacity})'
 
     children_num = 'NUMBER OF CHILDREN'

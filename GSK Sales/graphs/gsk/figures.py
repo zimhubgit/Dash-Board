@@ -1,5 +1,6 @@
 import plotly.graph_objects as go
 import data
+import name_space as nm
 
 
 def indicator(achieved: float, target: float, ly_achieved: float, label: str,
@@ -29,7 +30,7 @@ def indicator(achieved: float, target: float, ly_achieved: float, label: str,
         value=((achieved + target) / target * 100) if target != 0 else 0,
         delta={'reference': 100, 'suffix': '%',
                'increasing': {'color': data.get_delta_color(.9)}},
-        domain={'x': [0.25, .75], 'y': [0.2, 0.5]}
+        domain={'x': [0.25, .75], 'y': [0, 0.5]}
     ))
     return fig
 
@@ -43,6 +44,32 @@ def sunburst() -> go.Figure:
         branchvalues='total',
         insidetextorientation='radial',
     ))
+    fig.update_layout(
+        updatemenus=[
+            dict(
+                type="buttons",
+                direction="left",
+                buttons=list([
+                    dict(
+                        args=["type", "sunburst"],
+                        label="Repartition",
+                        method="restyle"
+                    ),
+                    dict(
+                        args=["type", "sunburst"],
+                        label="Heatmap",
+                        method="restyle"
+                    )
+                ]),
+                pad={"r": 10, "t": 10},
+                showactive=True,
+                x=0.11,
+                xanchor="left",
+                y=1.1,
+                yanchor="top"
+            ),
+        ]
+    )
 
     return fig
 
@@ -61,4 +88,73 @@ def water_fall() -> go.Figure:
     fig.update_layout(
         # showlegend=True
     )
+    return fig
+
+
+def stocks_hist_bar() -> go.Figure:
+    months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+              'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+
+    fig = go.Figure()
+    fig.add_trace(go.Bar(
+        x=months,
+        y=[20, 14, 25, 16, 18, 22, 19, 15, 12, 16, 14, 17],
+        name='Available Stock',
+        marker_color='indianred'
+    ))
+    fig.add_trace(go.Bar(
+        x=months,
+        y=[19, 14, 22, 14, 16, 19, 15, 14, 10, 12, 12, 16],
+        name='Quarentain Stock',
+        marker_color='lightsalmon'
+    ))
+
+    # Here we modify the tickangle of the xaxis, resulting in rotated labels.
+    fig.update_layout(barmode='overlay', xaxis_tickangle=-45)
+    return fig
+
+
+def sales_hist_bar() -> go.Figure:
+    months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+              'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+    targets = [25, 14, 26, 15, 20, 20, 16, 15, 12, 16, 14, 17]
+    actuals = [20, 14, 25, 16, 18, 22, 19, 15, 12, 16, 14, 17]
+    ly_actuals = [19, 14, 22, 14, 16, 19, 15, 14, 10, 12, 12, 16]
+
+    fig = go.Figure()
+    fig.add_trace(go.Bar(
+        x=months,
+        y=actuals,
+        name='2023',
+        marker_color=nm.NameMap.solid_gsk_orange
+    ))
+    for idx, month in enumerate(months):
+        fig.add_shape(type='line',
+                      xref='x',
+                      yref='y',
+                      x0=idx - .9 / 2,
+                      y0=targets[idx],
+                      x1=idx + .9 / 14,
+                      y1=targets[idx],
+                      line=dict(
+                          color="red",
+                          width=2,
+                      ),
+                      )
+        fig.add_shape(type="rect",
+                      xref='x', yref='y', fillcolor='lightblue',
+                      x0=idx - .9 / 2,
+                      y0=1,
+                      x1=idx + .9 / 2,
+                      y1=5,
+                      label=dict(text=f"G:\n{(actuals[idx] - ly_actuals[idx]) / ly_actuals[idx]:.2f}"))
+    fig.add_trace(go.Bar(
+        x=months,
+        y=ly_actuals,
+        name='2022',
+        marker_color='grey'
+    ))
+
+    # Here we modify the tickangle of the xaxis, resulting in rotated labels.
+    fig.update_layout(barmode='group', xaxis_tickangle=-45)
     return fig

@@ -16,6 +16,10 @@ class IDs:
     sales_repartition_sunburst = 'sales_repartition_sunburst_id'
     sales_repartition_waterfall = 'sales_repartition_waterfall_id'
 
+    sales_evolution_sect = 'sales_evolution_sect_id'
+    sales_evolution_bar = 'sales_evolution_bar_id'
+    stocks_evolution_bar = 'stocks_evolution_bar_id'
+
     radio = 'radio_id'
 
 
@@ -37,6 +41,8 @@ class Section:
                                                           Section.__2_sect_progress(),
                                                           html.Hr(),
                                                           Section.__3_sect_progress_dist(),
+                                                          html.Hr(),
+                                                          Section.__4_sect_progress_hist(),
                                                           ]
                                                 )
         return assembled_sections
@@ -114,7 +120,7 @@ class Section:
 
     @staticmethod
     def __3_sect_progress_dist() -> html.Div:
-        return html.Div(style={nm.height: '25%',
+        return html.Div(style={nm.height: '35%',
                                nm.border: '1px solid black',
                                },
                         children=[html.H4('Sales distribution',
@@ -147,10 +153,40 @@ class Section:
                                   ],
                         )
 
-
-@staticmethod
-def __4_sect_progress_hist() -> html.Div:
-    pass
+    @staticmethod
+    def __4_sect_progress_hist() -> html.Div:
+        return html.Div(style={nm.height: '25%',
+                               nm.border: '1px solid black',
+                               },
+                        children=[html.H4('Sales evolution',
+                                          style={nm.height: '15%'},
+                                          ),
+                                  html.Div(id=IDs.sales_evolution_sect,
+                                           style={nm.border: '1px solid black',
+                                                  nm.height: '10%',
+                                                  nm.display: nm.flex,
+                                                  nm.disposition: nm.flex_row},
+                                           children=[html.Div(style={nm.opacity: '1',
+                                                                     nm.bg_color: nm.rgba(39, 132, 245, 0.4),
+                                                                     nm.width: '50%',
+                                                                     nm.padding: '10px',
+                                                                     },
+                                                              children=[dcc.Graph(id=IDs.sales_evolution_bar),
+                                                                        ],
+                                                              ),
+                                                     html.Hr(),
+                                                     html.Div(style={nm.opacity: '1',
+                                                                     nm.bg_color: nm.rgba(39, 132, 245, 0.4),
+                                                                     nm.width: '50%',
+                                                                     nm.padding: '10px',
+                                                                     },
+                                                              children=[dcc.Graph(id=IDs.stocks_evolution_bar),
+                                                                        ],
+                                                              )
+                                                     ],
+                                           ),
+                                  ],
+                        )
 
 
 @staticmethod
@@ -171,3 +207,11 @@ class Update:
     @staticmethod
     def update_waterfall_section(sales_as: d.SalesAs) -> go.Figure:
         return fig.water_fall()
+
+    @staticmethod
+    def update_sales_evolution_bar(sales_as: d.SalesAs) -> go.Figure:
+        return fig.sales_hist_bar()
+
+    @staticmethod
+    def update_stocks_evolution_bar(sales_as: d.SalesAs) -> go.Figure:
+        return fig.stocks_hist_bar()

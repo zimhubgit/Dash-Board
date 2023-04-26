@@ -13,6 +13,8 @@ app.layout = layout.Dash.get()
     Output(layout.IDs.ytd_sales_indicator, 'figure'),
     Output(layout.IDs.sales_repartition_sunburst, 'figure'),
     Output(layout.IDs.sales_repartition_waterfall, 'figure'),
+    Output(layout.IDs.sales_evolution_bar, 'figure'),
+    Output(layout.IDs.stocks_evolution_bar, 'figure'),
     Input(layout.IDs.radio, 'value'),
 )
 def update(value):
@@ -22,7 +24,10 @@ def update(value):
             layout.Update.update_progress_section(sales_as),
             layout.Update.update_progress_section(sales_as),
             layout.Update.update_sunburst_section(sales_as),
-            layout.Update.update_waterfall_section(sales_as))
+            layout.Update.update_waterfall_section(sales_as),
+            layout.Update.update_sales_evolution_bar(sales_as),
+            layout.Update.update_stocks_evolution_bar(sales_as),
+            )
 
 
 app.run_server(debug=True)
