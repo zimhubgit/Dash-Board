@@ -55,6 +55,7 @@ def sunburst() -> go.Figure:
         parents=['', '', '', ''],
         branchvalues='total',
         insidetextorientation='radial',
+        textinfo='value+label+percent root',
     ))
     fig.layout.update(
         updatemenus=[go.layout.Updatemenu(
@@ -79,7 +80,7 @@ def color_map_sunburst() -> go.Figure:
     fig = px.sunburst(sunburst_df, path=['SKU'],
                       values='SALES VALUE(GBP)', color='REALISATIONS',
                       color_continuous_scale='rdylgn',
-                      range_color=[0, 100])
+                      range_color=[0, 100], )
     fig.update_traces({'insidetextorientation': 'radial'})
     fig.update_layout(paper_bgcolor='rgba(0,0,0,0)')
     return fig
@@ -160,7 +161,7 @@ def sales_hist_bar() -> go.Figure:
                       x0=idx - .9 / 2,
                       y0=1,
                       x1=idx + .9 / 2,
-                      y1=5,
+                      y1=3,
                       label=dict(text=f"G:\n{growth:.2f}"), )
     fig.add_trace(go.Bar(
         x=months,
