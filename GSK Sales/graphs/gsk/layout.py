@@ -9,6 +9,7 @@ class IDs:
     nav_bar_sect = 'navigation_bar_id'
     radio_b_data_source = 'data_source_radio_id'
     drop_d_brand = 'brand_drop_down_id'
+    drop_d_sku = 'sku_drop_down_id'
     radio_b_period_type = 'period_type_radio_id'
     drop_d_period_type_value = 'period_type_value_drop_down_id'
     button_show = 'show_button_id'
@@ -45,19 +46,18 @@ class Section:
                                                        },
                                                 children=[Section.__1_nav_bar(),
                                                           html.Br(),
-                                                          html.Hr(),
                                                           html.Div(style={nm.display: nm.flex,
                                                                           nm.flex_direction: nm.flex_col,
                                                                           nm.width: '90%',
                                                                           nm.padding: '10px'
                                                                           },
-                                                                   children=[Section.__1_sect_header(),
+                                                                   children=[Section.__2_sect_header(),
                                                                              html.Hr(),
-                                                                             Section.__2_sect_progress(),
+                                                                             Section.__3_sect_progress(),
                                                                              html.Hr(),
-                                                                             Section.__3_sect_progress_dist(),
+                                                                             Section.__4_sect_progress_dist(),
                                                                              html.Hr(),
-                                                                             Section.__4_sect_progress_hist(),
+                                                                             Section.__5_sect_progress_hist(),
                                                                              ],
                                                                    ),
                                                           ]
@@ -69,8 +69,9 @@ class Section:
         return html.Div(id=IDs.nav_bar_sect,
                         style={nm.padding: '10px',
                                nm.width: '10%',
-                               nm.bg_color: nm.rgba(39, 132, 245, 0.4),
-                               nm.shadow: '2px 2px 2px lightgrey',
+                               nm.bg_color: nm.rgba(251, 249, 250, 0.94),
+                               nm.shadow: '5px 5px 10px lightgrey',
+                               nm.border_radius: '10px',
                                },
                         children=[html.Label('Data Sources:',
                                              style={nm.text_deco: nm.underline,
@@ -96,6 +97,20 @@ class Section:
                                   dcc.Dropdown(id=IDs.drop_d_brand,
                                                options=['All', 'Augmentin', 'Clamoxyl', 'Ventoline', 'Flixotide',
                                                         'Seretide'],
+                                               value='All',
+                                               clearable=False,
+                                               searchable=True,
+                                               ),
+                                  html.Hr(),
+                                  html.Br(),
+                                  html.Label('Selected SKU: All',
+                                             style={nm.text_deco: nm.underline,
+                                                    nm.font_weight: nm.bold,
+                                                    nm.color: 'grey',
+                                                    },
+                                             ),
+                                  dcc.Dropdown(id=IDs.drop_d_sku,
+                                               options=['All'],
                                                value='All',
                                                clearable=False,
                                                searchable=True,
@@ -136,11 +151,12 @@ class Section:
                         )
 
     @staticmethod
-    def __1_sect_header() -> html.Div:
+    def __2_sect_header() -> html.Div:
         return html.Div(style={nm.height: '5%',
-                               nm.border: '1px solid black',
                                nm.bg_color: nm.gsk_orange(),
                                nm.padding: '10px',
+                               nm.border_radius: '10px',
+                               nm.shadow: '5px 5px 5px lightgrey'
                                },
                         children=['GSK Dash Header',
                                   dcc.RadioItems(id=IDs.radio,
@@ -154,12 +170,15 @@ class Section:
                         )
 
     @staticmethod
-    def __2_sect_progress() -> html.Div:
+    def __3_sect_progress() -> html.Div:
         return html.Div(style={
             nm.padding: '10px',
         },
-            children=[html.H4('Achievements',
+            children=[html.H5('Achievements',
                               style={nm.height: '5%',
+                                     nm.text_deco: nm.underline,
+                                     nm.border_radius: '5px',
+                                     nm.shadow: '2px 2px lightgrey',
                                      },
                               ),
                       html.Div(title='Overall achievements',
@@ -174,7 +193,7 @@ class Section:
                                                          },
                                                   children=[dcc.Graph(id=IDs.mtd_sales_indicator,
                                                                       style={nm.border_radius: '15px',
-                                                                             nm.bg_color_fig: 'white',
+                                                                             nm.bg_color_fig: nm.gsk_orange(.5),
                                                                              nm.shadow: nm.defautl_shadow,
                                                                              },
                                                                       ),
@@ -225,12 +244,15 @@ class Section:
         )
 
     @staticmethod
-    def __3_sect_progress_dist() -> html.Div:
+    def __4_sect_progress_dist() -> html.Div:
         return html.Div(style={
             nm.padding: '10px',
         },
-            children=[html.H4('Sales distribution',
+            children=[html.H5('Sales distribution',
                               style={nm.height: '5%',
+                                     nm.text_deco: nm.underline,
+                                     nm.border_radius: '5px',
+                                     nm.shadow: '2px 2px lightgrey',
                                      },
                               ),
                       html.Div(id=IDs.sales_repartition_sect,
@@ -268,12 +290,15 @@ class Section:
         )
 
     @staticmethod
-    def __4_sect_progress_hist() -> html.Div:
+    def __5_sect_progress_hist() -> html.Div:
         return html.Div(style={
             nm.padding: '10px',
         },
-            children=[html.H4('Sales evolution',
+            children=[html.H5('Sales evolution',
                               style={nm.height: '5%',
+                                     nm.text_deco: nm.underline,
+                                     nm.border_radius: '5px',
+                                     nm.shadow: '2px 2px lightgrey',
                                      },
                               ),
                       html.Div(id=IDs.sales_evolution_sect,
@@ -312,7 +337,7 @@ class Section:
         )
 
     @staticmethod
-    def __5_sect_stock_hist() -> html.Div:
+    def __6_sect_stock_hist() -> html.Div:
         pass
 
 

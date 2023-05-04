@@ -4,6 +4,8 @@ import data
 import pandas as pnd
 import name_space as nm
 
+figures_cache: dict[str, go.Figure] = {}
+
 
 def indicator(achieved: float, target: float, ly_achieved: float, label: str,
               sales_as: data.SalesAs = data.SalesAs(data.SalesAs.value)) -> go.Figure:
@@ -20,7 +22,7 @@ def indicator(achieved: float, target: float, ly_achieved: float, label: str,
         gauge={
             'axis': {'range': [None, gauge_range]},
             'threshold': {
-                'line': {'color': "red", 'width': 4},
+                'line': {'color': "green", 'width': 4},
                 'thickness': 1, 'value': target},
 
             'bgcolor': 'white',
@@ -29,12 +31,12 @@ def indicator(achieved: float, target: float, ly_achieved: float, label: str,
             'bar': {'color': '#10BA4D'}}))
     fig.add_shape(type='line',
                   x0=.1,
-                  y0=.4,
+                  y0=.35,
                   x1=.9,
-                  y1=.4,
+                  y1=.35,
                   line=dict(
                       color="grey",
-                      width=2,
+                      width=1,
                   ))
     fig.add_trace(go.Indicator(
         mode='delta',
@@ -43,6 +45,15 @@ def indicator(achieved: float, target: float, ly_achieved: float, label: str,
                'increasing': {'color': data.get_delta_color(.9)}},
         domain={'x': [0.25, .75], 'y': [0, 0.5]}
     ))
+    fig.add_shape(type='line',
+                  x0=.1,
+                  y0=.15,
+                  x1=.9,
+                  y1=.15,
+                  line=dict(
+                      color="grey",
+                      width=1,
+                  ))
     fig.update_layout(paper_bgcolor='rgba(0,0,0,0)')
     return fig
 
@@ -88,7 +99,7 @@ def color_map_sunburst() -> go.Figure:
 
 def water_fall() -> go.Figure:
     fig = go.Figure(go.Waterfall(
-        name="20", orientation="v",
+        name="Brands", orientation="v",
         measure=["relative", "relative", "relative", "relative", "total"],
         x=["Augmentin", "Clamoxyl", "Ventoline", "Flixotide", 'Total'],
         textposition="outside",
@@ -98,7 +109,7 @@ def water_fall() -> go.Figure:
     ))
 
     fig.update_layout(
-        # showlegend=True
+        showlegend=True
     )
     fig.update_layout(paper_bgcolor='rgba(0,0,0,0)')
     return fig
@@ -157,7 +168,10 @@ def sales_hist_bar() -> go.Figure:
                       )
         growth = (actuals[idx] - ly_actuals[idx]) / ly_actuals[idx]
         fig.add_shape(type="rect",
-                      xref='x', yref='y', fillcolor='seagreen' if growth > 0.03 else 'red',
+                      xref='x', yref='y',
+                      fillcolor=nm.NameMap.rgba(198, 244, 229, 0.94) if growth > 0.03 else nm.NameMap.rgba(244, 198,
+                                                                                                           198, .94),
+                      line=dict(color='seagreen' if growth > 0.03 else 'red'),
                       x0=idx - .9 / 2,
                       y0=1,
                       x1=idx + .9 / 2,

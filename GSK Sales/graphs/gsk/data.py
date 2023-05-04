@@ -1,4 +1,5 @@
 import parametres.src.name_space as nm
+import pandas as pnd
 
 
 class SalesAs:
@@ -19,7 +20,26 @@ class SalesAs:
             self.rfc = nm.GSK.ColName.RFC_VALUE_COL
             self.achieved = nm.GSK.ColName.VALUE_SALES
         else:
-            raise Exception('Sales as error')
+            raise Exception('"Sales As" error')
+
+
+class Data:
+    data_source_cache: dict[str, pnd.DataFrame] = {}
+    dataset_dict: dict[str, pnd.DataFrame]
+
+    @staticmethod
+    def filter_dataset(dataset: pnd.DataFrame, prd_type: str, brand: str, sku: str,
+                       date: pnd.Timestamp) -> pnd.DataFrame:
+        df: pnd.DataFrame
+        df = dataset.copy()
+        df = df[df[nm.GSK.ColName.PERIOD_TYPE] == prd_type]
+        df = df[df[nm.GSK.ColName.DATE] == date]
+        if sku is not None:
+            df = df[df[nm.GSK.ColName.SKU] == sku]
+        else:
+            df = df[df[nm.GSK.ColName.BRAND] == sku]
+        df = df[df[nm.GSK.ColName.BRAND] == brand]
+        return df
 
 
 def get_delta_color(progression: float) -> str:
