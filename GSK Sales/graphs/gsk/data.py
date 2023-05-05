@@ -1,6 +1,9 @@
 import parametres.src.name_space as nm
 import pandas as pnd
 
+ly_key = '2022'
+cy_key = '2023'
+
 
 class SalesAs:
     value: str = 'Value'
@@ -39,6 +42,7 @@ class Data:
         self.year: str = year
         self.dataset: pnd.DataFrame = dataset
         self.cache: Cache = Cache()
+        self.last_update_on: pnd.Timestamp = self.dataset[nm.GSK.ColName.UPDATED_ON].values[0]
 
     def filter(self, prd_type: str, brand: str, sku: str,
                date: pnd.Timestamp, end_date: pnd.Timestamp) -> pnd.DataFrame:
