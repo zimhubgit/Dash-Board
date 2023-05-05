@@ -24,8 +24,13 @@ class SalesAs:
 
 
 class Cache:
-    data_source_cache: dict[str, pnd.DataFrame] = {}
-    dataset_dict: dict[str, pnd.DataFrame]
+    def __init__(self):
+        self.data_source_cache: dict[str, pnd.DataFrame] = {}
+        self.dataset_dict: dict[str, pnd.DataFrame] = {}
+
+    def clear(self):
+        self.dataset_dict = {}
+        self.data_source_cache = {}
 
 
 class Data:
@@ -33,10 +38,28 @@ class Data:
     def __init__(self, year: str, dataset: pnd.DataFrame):
         self.year: str = year
         self.dataset: pnd.DataFrame = dataset
+        self.cache: Cache = Cache()
 
     def filter(self, prd_type: str, brand: str, sku: str,
                date: pnd.Timestamp, end_date: pnd.Timestamp) -> pnd.DataFrame:
-        return Data.filter_dataset(self.dataset, prd_type, brand, sku, date, end_date)
+        cached_df_key: str = f'{prd_type}:{brand}:{sku}:{str(date)}'
+        cached_df = self.cache.dataset_dict.get(cached_df_key)
+        if cached_df is not None and not cached_df.empty:
+            return cached_df
+        df: pnd.DataFrame
+        df = self.dataset.copy()
+        df = df[df[nm.GSK.ColName.PERIOD_TYPE] == prd_type]
+        if end_date is None:
+            df = df[df[nm.GSK.ColName.DATE] == date]
+        else:
+            df = df[(df[nm.GSK.ColName.DATE] >= date) & (df[nm.GSK.ColName.DATE] <= date)]
+        if sku is not None:
+            df = df[df[nm.GSK.ColName.SKU] == sku]
+        else:
+            df = df[df[nm.GSK.ColName.BRAND] == sku]
+        df = df[df[nm.GSK.ColName.BRAND] == brand]
+        self.cache.dataset_dict.update({cached_df_key: df})
+        return df
 
     @staticmethod
     def filter_dataset(dataset: pnd.DataFrame,
