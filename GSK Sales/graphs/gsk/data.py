@@ -23,28 +23,52 @@ class SalesAs:
             raise Exception('"Sales As" error')
 
 
-class Data:
+class Cache:
     data_source_cache: dict[str, pnd.DataFrame] = {}
     dataset_dict: dict[str, pnd.DataFrame]
 
+
+class Data:
+
+    def __init__(self, year: str, dataset: pnd.DataFrame):
+        self.year: str = year
+        self.dataset: pnd.DataFrame = dataset
+
+    def filter(self, prd_type: str, brand: str, sku: str,
+               date: pnd.Timestamp, end_date: pnd.Timestamp) -> pnd.DataFrame:
+        return Data.filter_dataset(self.dataset, prd_type, brand, sku, date, end_date)
+
     @staticmethod
-    def filter_dataset(dataset: pnd.DataFrame, prd_type: str, brand: str, sku: str,
-                       date: pnd.Timestamp) -> pnd.DataFrame:
+    def filter_dataset(dataset: pnd.DataFrame,
+                       prd_type: str,
+                       brand: str,
+                       sku: str,
+                       date: pnd.Timestamp,
+                       end_date: pnd.Timestamp) -> pnd.DataFrame:
+
+        cached_df_key: str = f'{prd_type}:{brand}:{sku}:{str(date)}'
+        cached_df = Cache.dataset_dict.get(cached_df_key)
+        if cached_df is not None and not cached_df.empty:
+            return cached_df
         df: pnd.DataFrame
         df = dataset.copy()
         df = df[df[nm.GSK.ColName.PERIOD_TYPE] == prd_type]
-        df = df[df[nm.GSK.ColName.DATE] == date]
+        if end_date is None:
+            df = df[df[nm.GSK.ColName.DATE] == date]
+        else:
+            df = df[(df[nm.GSK.ColName.DATE] >= date) & (df[nm.GSK.ColName.DATE] <= date)]
         if sku is not None:
             df = df[df[nm.GSK.ColName.SKU] == sku]
         else:
             df = df[df[nm.GSK.ColName.BRAND] == sku]
         df = df[df[nm.GSK.ColName.BRAND] == brand]
+        Cache.dataset_dict.update({cached_df_key: df})
         return df
 
 
 def get_delta_color(progression: float) -> str:
     default_red_color: str = '#FF4136'
-    defautl_green_color: str = '#3D9970'
+    default_green_color: str = '#3D9970'
     dark_green_color: str = '#033301'
     dark_red_color: str = '#690902'
     orange_color: str = '#db9f07'
@@ -56,8 +80,17 @@ def get_delta_color(progression: float) -> str:
     elif progression < .85:
         return orange_color
     elif progression < .95:
-        return defautl_green_color
+        return default_green_color
     elif progression < 1.1:
         return dark_green_color
     else:
         return blue_color
+
+
+data_dict: dict[str, Data] = {}
+
+
+def load(data_src_file_name: str):
+    data_src_dict = pnd.read_excel(data_src_file_name, sheet_name=None)
+    for year_key, source_dataset in data_src_dict.items():
+        data_dict.update({year_key: Data(year_key, source_dataset)})

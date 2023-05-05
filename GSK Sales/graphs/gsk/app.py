@@ -1,9 +1,20 @@
+import os
+
 from dash import Dash, Input, Output
 import layout
 import data as d
 
+current_dir = os.path.abspath(os.curdir)
+parent_dir = os.path.abspath(os.path.join(current_dir, os.pardir))
+grandparent_dir = os.path.abspath(os.path.join(parent_dir, os.pardir))
+
+GSK_SALES_DIR: str = f'{grandparent_dir}{os.sep}output'
+GSK_SALES_FILE_NAME: str = f'{GSK_SALES_DIR}{os.sep}GSK SALES.xlsx'
+
 app = Dash(__name__)
 app.layout = layout.Dash.get()
+
+d.load(GSK_SALES_FILE_NAME)
 
 
 @app.callback(
