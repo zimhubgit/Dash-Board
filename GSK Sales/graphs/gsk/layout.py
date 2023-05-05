@@ -341,7 +341,7 @@ class Section:
         pass
 
 
-class Update:
+class FiguresUpdater:
     @staticmethod
     def update_progress_section(sales_as: d.SalesAs) -> go.Figure:
         return fig.indicator(achieved=11000, target=26000, label='MTD Progress', sales_as=d.SalesAs(d.SalesAs.volume),

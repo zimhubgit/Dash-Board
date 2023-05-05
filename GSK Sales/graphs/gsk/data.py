@@ -61,33 +61,6 @@ class Data:
         self.cache.dataset_dict.update({cached_df_key: df})
         return df
 
-    @staticmethod
-    def filter_dataset(dataset: pnd.DataFrame,
-                       prd_type: str,
-                       brand: str,
-                       sku: str,
-                       date: pnd.Timestamp,
-                       end_date: pnd.Timestamp) -> pnd.DataFrame:
-
-        cached_df_key: str = f'{prd_type}:{brand}:{sku}:{str(date)}'
-        cached_df = Cache.dataset_dict.get(cached_df_key)
-        if cached_df is not None and not cached_df.empty:
-            return cached_df
-        df: pnd.DataFrame
-        df = dataset.copy()
-        df = df[df[nm.GSK.ColName.PERIOD_TYPE] == prd_type]
-        if end_date is None:
-            df = df[df[nm.GSK.ColName.DATE] == date]
-        else:
-            df = df[(df[nm.GSK.ColName.DATE] >= date) & (df[nm.GSK.ColName.DATE] <= date)]
-        if sku is not None:
-            df = df[df[nm.GSK.ColName.SKU] == sku]
-        else:
-            df = df[df[nm.GSK.ColName.BRAND] == sku]
-        df = df[df[nm.GSK.ColName.BRAND] == brand]
-        Cache.dataset_dict.update({cached_df_key: df})
-        return df
-
 
 def get_delta_color(progression: float) -> str:
     default_red_color: str = '#FF4136'

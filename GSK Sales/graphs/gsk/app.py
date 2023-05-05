@@ -10,11 +10,10 @@ grandparent_dir = os.path.abspath(os.path.join(parent_dir, os.pardir))
 
 GSK_SALES_DIR: str = f'{grandparent_dir}{os.sep}output'
 GSK_SALES_FILE_NAME: str = f'{GSK_SALES_DIR}{os.sep}GSK SALES.xlsx'
+d.load(GSK_SALES_FILE_NAME)
 
 app = Dash(__name__)
 app.layout = layout.Dash.get()
-
-d.load(GSK_SALES_FILE_NAME)
 
 
 @app.callback(
@@ -30,14 +29,14 @@ d.load(GSK_SALES_FILE_NAME)
 )
 def update(value):
     sales_as = d.SalesAs(d.SalesAs.volume)
-    return (layout.Update.update_progress_section(sales_as),
-            layout.Update.update_progress_section(sales_as),
-            layout.Update.update_progress_section(sales_as),
-            layout.Update.update_progress_section(sales_as),
-            layout.Update.update_sunburst_section(sales_as),
-            layout.Update.update_waterfall_section(sales_as),
-            layout.Update.update_sales_evolution_bar(sales_as),
-            layout.Update.update_stocks_evolution_bar(sales_as),
+    return (layout.FiguresUpdater.update_progress_section(sales_as),
+            layout.FiguresUpdater.update_progress_section(sales_as),
+            layout.FiguresUpdater.update_progress_section(sales_as),
+            layout.FiguresUpdater.update_progress_section(sales_as),
+            layout.FiguresUpdater.update_sunburst_section(sales_as),
+            layout.FiguresUpdater.update_waterfall_section(sales_as),
+            layout.FiguresUpdater.update_sales_evolution_bar(sales_as),
+            layout.FiguresUpdater.update_stocks_evolution_bar(sales_as),
             )
 
 
