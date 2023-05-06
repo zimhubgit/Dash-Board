@@ -7,7 +7,10 @@ import name_space as nm
 figures_cache: dict[str, go.Figure] = {}
 
 
-def indicator(achieved: float, target: float, ly_achieved: float, label: str,
+def indicator(achieved: float,
+              target: float,
+              ly_achieved: float,
+              label: str,
               sales_as: data.SalesAs = data.SalesAs(data.SalesAs.value)) -> go.Figure:
     # progress_over_time = progression_over_time_mile_stone(actual_progress=actual,
     #                                                       target_progress=target, )
@@ -36,7 +39,7 @@ def indicator(achieved: float, target: float, ly_achieved: float, label: str,
                   y1=.35,
                   line=dict(
                       color="grey",
-                      width=1,
+                      width=.5,
                   ))
     fig.add_trace(go.Indicator(
         mode='delta',
@@ -52,7 +55,7 @@ def indicator(achieved: float, target: float, ly_achieved: float, label: str,
                   y1=.15,
                   line=dict(
                       color="grey",
-                      width=1,
+                      width=.5,
                   ))
     fig.update_layout(paper_bgcolor='rgba(0,0,0,0)')
     return fig
@@ -67,6 +70,7 @@ def sunburst() -> go.Figure:
         branchvalues='total',
         insidetextorientation='radial',
         textinfo='value+label+percent root',
+        visible=False,
     ))
     fig.layout.update(
         updatemenus=[go.layout.Updatemenu(

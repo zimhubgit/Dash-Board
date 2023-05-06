@@ -3,6 +3,7 @@ import plotly.graph_objects as go
 import figures as fig
 from name_space import NameMap as nmap
 import parametres.src.name_space as nm
+import pandas as pnd
 
 import data as d
 
@@ -22,6 +23,18 @@ class IDs:
     std_sales_indicator = 'std_sales_indicator_id'
     ytd_sales_indicator = 'ytd_sales_indicator_id'
 
+    aug_sales_indicator_sect = 'aug_sales_indicators_sect_id'
+    aug_mtd_sales_indicator = 'aug_mtd_sales_indicator_id'
+    aug_qtd_sales_indicator = 'aug_qtd_sales_indicator_id'
+    aug_std_sales_indicator = 'aug_std_sales_indicator_id'
+    aug_ytd_sales_indicator = 'aug_ytd_sales_indicator_id'
+
+    clam_sales_indicator_sect = 'clam_sales_indicators_sect_id'
+    clam_mtd_sales_indicator = 'clam_mtd_sales_indicator_id'
+    clam_qtd_sales_indicator = 'clam_qtd_sales_indicator_id'
+    clam_std_sales_indicator = 'clam_std_sales_indicator_id'
+    clam_ytd_sales_indicator = 'clam_ytd_sales_indicator_id'
+
     sales_repartition_sect = 'sales_repartition_sect_id'
     sales_repartition_sunburst = 'sales_repartition_sunburst_id'
     sales_repartition_waterfall = 'sales_repartition_waterfall_id'
@@ -30,7 +43,7 @@ class IDs:
     sales_evolution_bar = 'sales_evolution_bar_id'
     stocks_evolution_bar = 'stocks_evolution_bar_id'
 
-    radio = 'radio_id'
+    radio_b_sales_as = 'sales_as_radio_id'
 
 
 class Dash:
@@ -55,7 +68,30 @@ class Section:
                                                                           },
                                                                    children=[Section.__2_sect_header(),
                                                                              html.Hr(),
-                                                                             Section.__3_sect_progress(),
+                                                                             Section.__3_sect_progress(
+                                                                                 IDs.sales_indicator_sect,
+                                                                                 IDs.mtd_sales_indicator,
+                                                                                 IDs.qtd_sales_indicator,
+                                                                                 IDs.std_sales_indicator,
+                                                                                 IDs.ytd_sales_indicator,
+                                                                                 tile_color=nmap.gsk_orange(.3),
+                                                                                 shadow_color=nmap.defautl_shadow),
+                                                                             Section.__3_sect_progress(
+                                                                                 IDs.aug_sales_indicator_sect,
+                                                                                 IDs.aug_mtd_sales_indicator,
+                                                                                 IDs.aug_qtd_sales_indicator,
+                                                                                 IDs.aug_std_sales_indicator,
+                                                                                 IDs.aug_ytd_sales_indicator,
+                                                                                 tile_color=nmap.aug_blue(.2),
+                                                                                 shadow_color=nmap.defautl_shadow),
+                                                                             Section.__3_sect_progress(
+                                                                                 IDs.clam_sales_indicator_sect,
+                                                                                 IDs.clam_mtd_sales_indicator,
+                                                                                 IDs.clam_qtd_sales_indicator,
+                                                                                 IDs.clam_std_sales_indicator,
+                                                                                 IDs.clam_ytd_sales_indicator,
+                                                                                 tile_color=nmap.clam_red(.3),
+                                                                                 shadow_color=nmap.defautl_shadow),
                                                                              html.Hr(),
                                                                              Section.__4_sect_progress_dist(),
                                                                              html.Hr(),
@@ -161,18 +197,20 @@ class Section:
                                nmap.shadow: '5px 5px 5px lightgrey'
                                },
                         children=['GSK Dash Header',
-                                  dcc.RadioItems(id=IDs.radio,
+                                  dcc.RadioItems(id=IDs.radio_b_sales_as,
                                                  style={},
-                                                 options=[{'label': 'Value', 'value': d.SalesAs(d.SalesAs.volume).name},
-                                                          {'label': 'Volume', 'value': d.SalesAs(d.SalesAs.value).name},
-                                                          ],
+                                                 options=[
+                                                     {'label': 'Volume', 'value': d.SalesAs(d.SalesAs.volume).name},
+                                                     {'label': 'Value', 'value': d.SalesAs(d.SalesAs.value).name},
+                                                 ],
                                                  value=d.SalesAs(d.SalesAs.volume).name
                                                  ),
                                   ],
                         )
 
     @staticmethod
-    def __3_sect_progress() -> html.Div:
+    def __3_sect_progress(sect_id: str, mtd_id: str, qtd_id: str, std_id: str, ytd_id: str, tile_color: str,
+                          shadow_color: str) -> html.Div:
         return html.Div(style={
             nmap.padding: '10px',
         },
@@ -180,23 +218,25 @@ class Section:
                               style={nmap.height: '5%',
                                      nmap.text_deco: nmap.underline,
                                      nmap.border_radius: '5px',
-                                     nmap.shadow: '2px 2px lightgrey',
+                                     nmap.shadow: '2px 2px lightgrey'
                                      },
                               ),
                       html.Div(title='Overall achievements',
-                               id=IDs.sales_indicator_sect,
+                               id=sect_id,
                                style={nmap.display: nmap.flex,
                                       nmap.disposition: nmap.flex_row,
+                                      nmap.height: '300px'
                                       },
                                children=[html.Div(style={nmap.opacity: '1',
                                                          nmap.width: '25%',
                                                          nmap.padding: '10px',
                                                          nmap.border_radius: '15px',
                                                          },
-                                                  children=[dcc.Graph(id=IDs.mtd_sales_indicator,
+                                                  children=[dcc.Graph(id=mtd_id,
                                                                       style={nmap.border_radius: '15px',
-                                                                             nmap.bg_color_fig: nmap.gsk_orange(.5),
-                                                                             nmap.shadow: nmap.defautl_shadow,
+                                                                             nmap.bg_color_fig: tile_color,
+                                                                             nmap.shadow: shadow_color,
+                                                                             nmap.height: '100%',
                                                                              },
                                                                       ),
                                                             ],
@@ -206,10 +246,11 @@ class Section:
                                                          nmap.padding: '10px',
                                                          nmap.border_radius: '15px',
                                                          },
-                                                  children=[dcc.Graph(id=IDs.qtd_sales_indicator,
+                                                  children=[dcc.Graph(id=qtd_id,
                                                                       style={nmap.border_radius: '15px',
-                                                                             nmap.bg_color_fig: 'white',
-                                                                             nmap.shadow: nmap.defautl_shadow,
+                                                                             nmap.bg_color_fig: tile_color,
+                                                                             nmap.shadow: shadow_color,
+                                                                             nmap.height: '100%',
                                                                              },
                                                                       ),
                                                             ],
@@ -219,10 +260,11 @@ class Section:
                                                          nmap.padding: '10px',
                                                          nmap.border_radius: '15px',
                                                          },
-                                                  children=[dcc.Graph(id=IDs.std_sales_indicator,
+                                                  children=[dcc.Graph(id=std_id,
                                                                       style={nmap.border_radius: '15px',
-                                                                             nmap.bg_color_fig: 'white',
-                                                                             nmap.shadow: nmap.defautl_shadow,
+                                                                             nmap.bg_color_fig: tile_color,
+                                                                             nmap.shadow: shadow_color,
+                                                                             nmap.height: '100%',
                                                                              },
                                                                       ),
                                                             ],
@@ -232,10 +274,11 @@ class Section:
                                                          nmap.padding: '10px',
                                                          nmap.border_radius: '15px',
                                                          },
-                                                  children=[dcc.Graph(id=IDs.ytd_sales_indicator,
+                                                  children=[dcc.Graph(id=ytd_id,
                                                                       style={nmap.border_radius: '15px',
-                                                                             nmap.bg_color_fig: 'white',
-                                                                             nmap.shadow: nmap.defautl_shadow,
+                                                                             nmap.bg_color_fig: tile_color,
+                                                                             nmap.shadow: shadow_color,
+                                                                             nmap.height: '100%',
                                                                              },
                                                                       ),
                                                             ],
@@ -345,9 +388,34 @@ class Section:
 
 class FiguresUpdater:
     @staticmethod
-    def update_progress_section(sales_as: d.SalesAs) -> go.Figure:
-        return fig.indicator(achieved=11000, target=26000, label='MTD Progress', sales_as=d.SalesAs(d.SalesAs.volume),
-                             ly_achieved=25000)
+    def update_progress_section(prd_type: str,
+                                brand: str | None,
+                                sku: str | None,
+                                end_date: pnd.Timestamp | None,
+                                sales_as: d.SalesAs) -> go.Figure:
+        update: pnd.Timestamp = d.data_dict[d.cy_key].last_update_on
+        date: pnd.Timestamp = update
+        ly_date = d.Data.translate_date_to_ly_date(date)
+
+        if prd_type == 'QTD':
+            date = d.Data.translate_date_qtd_date(date)
+            ly_date = d.Data.translate_date_qtd_date(ly_date)
+        elif prd_type == 'STD':
+            date = d.Data.translate_date_std_date(date)
+            ly_date = d.Data.translate_date_std_date(ly_date)
+        elif prd_type == 'YTD':
+            date = d.Data.translate_date_ytd_date(date)
+            ly_date = d.Data.translate_date_ytd_date(ly_date)
+
+        cy_df = d.data_dict[d.cy_key].filter(prd_type, brand, sku, date, end_date)
+        ly_df = d.data_dict[d.ly_key].filter(prd_type, brand, sku, ly_date, end_date)
+        achieved: float = cy_df[sales_as.achieved].values[0]
+        target: float = cy_df[sales_as.rfc].values[0]
+        label: str = f'{prd_type} Progression : {update.day}/{update.month}/{update.year}'
+        ly_achievement: float = ly_df[sales_as.achieved].values[0]
+
+        return fig.indicator(achieved=achieved, target=target, label=label, sales_as=sales_as,
+                             ly_achieved=ly_achievement)
 
     @staticmethod
     def update_sunburst_section(sales_as: d.SalesAs) -> go.Figure:

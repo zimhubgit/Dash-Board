@@ -7,6 +7,14 @@ class NameMap:
     def gsk_orange(opacity: float = 0.7):
         return NameMap.rgba(243, 102, 51, opacity)
 
+    @staticmethod
+    def aug_blue(opacity: float = 0.7):
+        return NameMap.rgba(92, 152, 251, opacity)
+
+    @staticmethod
+    def clam_red(opacity: float = 0.7):
+        return NameMap.rgba(238, 14, 14, opacity)
+
     children_num = 'NUMBER OF CHILDREN'
     disposition = 'DISPOSITION'
     orientation = 'ORIENTATION'

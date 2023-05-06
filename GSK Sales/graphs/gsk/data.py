@@ -26,6 +26,10 @@ class SalesAs:
             raise Exception('"Sales As" error')
 
 
+sales_as_volume = SalesAs(SalesAs.volume)
+sales_as_value = SalesAs(SalesAs.value)
+
+
 class Cache:
     def __init__(self):
         self.data_source_cache: dict[str, pnd.DataFrame] = {}
@@ -42,7 +46,7 @@ class Data:
         self.year: str = year
         self.dataset: pnd.DataFrame = dataset
         self.cache: Cache = Cache()
-        self.last_update_on: pnd.Timestamp = self.dataset[nm.GSK.ColName.UPDATED_ON].values[0]
+        self.last_update_on: pnd.Timestamp = pnd.Timestamp(self.dataset[nm.GSK.ColName.UPDATED_ON].values[0])
 
     def filter(self, prd_type: str, brand: str, sku: str,
                date: pnd.Timestamp, end_date: pnd.Timestamp) -> pnd.DataFrame:
@@ -50,8 +54,7 @@ class Data:
         cached_df = self.cache.dataset_dict.get(cached_df_key)
         if cached_df is not None and not cached_df.empty:
             return cached_df
-        df: pnd.DataFrame
-        df = self.dataset.copy()
+        df: pnd.DataFrame = self.dataset.copy()
         df = df[df[nm.GSK.ColName.PERIOD_TYPE] == prd_type]
         if end_date is None:
             df = df[df[nm.GSK.ColName.DATE] == date]
@@ -60,10 +63,29 @@ class Data:
         if sku is not None:
             df = df[df[nm.GSK.ColName.SKU] == sku]
         else:
-            df = df[df[nm.GSK.ColName.BRAND] == sku]
-        df = df[df[nm.GSK.ColName.BRAND] == brand]
+            df = df[df[nm.GSK.ColName.BRAND] == brand]
         self.cache.dataset_dict.update({cached_df_key: df})
         return df
+
+    @staticmethod
+    def translate_date_to_ly_date(date: pnd.Timestamp) -> pnd.Timestamp:
+        return pnd.Timestamp(year=date.year - 1, month=date.month, day=1,
+                             hour=date.hour) + pnd.offsets.MonthEnd(1)
+
+    @staticmethod
+    def translate_date_qtd_date(date: pnd.Timestamp) -> pnd.Timestamp:
+        return date + pnd.offsets.QuarterEnd(1)
+
+    @staticmethod
+    def translate_date_std_date(date: pnd.Timestamp) -> pnd.Timestamp:
+        if date.month <= 6:
+            return pnd.Timestamp(year=date.year, month=6, day=30, hour=date.hour)
+        else:
+            return pnd.Timestamp(year=date.year, month=12, day=31, hour=date.hour)
+
+    @staticmethod
+    def translate_date_ytd_date(date: pnd.Timestamp) -> pnd.Timestamp:
+        return date + pnd.offsets.YearEnd(1)
 
 
 def get_delta_color(progression: float) -> str:
