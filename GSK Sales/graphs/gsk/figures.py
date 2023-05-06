@@ -20,8 +20,8 @@ def indicator(achieved: float,
         mode="number+gauge+delta", value=achieved,
         domain={'x': [0, 1], 'y': [0.5, 1]},
         delta={'reference': target, 'position': "top"},
-        title={'text': f"<b>{label}</b><br><span style='color: gray; font-size:0.8em'>{sales_as.name}</span>",
-               'font': {"size": 14}},
+        title={'text': f"<b>{label}</b><br><span style='color: gray; font-size:0.9em'>{sales_as.name}</span>",
+               'font': {"size": 16}},
         gauge={
             'axis': {'range': [None, gauge_range]},
             'threshold': {
@@ -32,15 +32,30 @@ def indicator(achieved: float,
             'steps': [
                 {'range': [0, ly_achieved], 'color': '#DDDDDD'}],
             'bar': {'color': '#10BA4D'}}))
-    fig.add_shape(type='line',
-                  x0=.1,
-                  y0=.35,
-                  x1=.9,
-                  y1=.35,
-                  line=dict(
-                      color="grey",
-                      width=.5,
-                  ))
+    # fig.add_annotation(x=.5,
+    #                    y=0,
+    #                    text='99.5 %',
+    #                    showarrow=False,
+    #                    font=dict(
+    #                        family="Courier New, monospace",
+    #                        size=20,
+    #                        color="green",
+    #                    ),
+    #                    # bordercolor="#c7c7c7",
+    #                    borderwidth=2,
+    #                    borderpad=4,
+    #                    bgcolor="#ff7f0e",
+    #                    opacity=0.8,
+    #                    )
+    # fig.add_shape(type='line',
+    #               x0=.1,
+    #               y0=.35,
+    #               x1=.9,
+    #               y1=.35,
+    #               line=dict(
+    #                   color="grey",
+    #                   width=.5,
+    #               ))
     fig.add_trace(go.Indicator(
         mode='delta',
         value=((achieved + target) / target * 100) if target != 0 else 0,
@@ -48,15 +63,15 @@ def indicator(achieved: float,
                'increasing': {'color': data.get_delta_color(.9)}},
         domain={'x': [0.25, .75], 'y': [0, 0.5]}
     ))
-    fig.add_shape(type='line',
-                  x0=.1,
-                  y0=.15,
-                  x1=.9,
-                  y1=.15,
-                  line=dict(
-                      color="grey",
-                      width=.5,
-                  ))
+    # fig.add_shape(type='line',
+    #               x0=.1,
+    #               y0=.15,
+    #               x1=.9,
+    #               y1=.15,
+    #               line=dict(
+    #                   color="grey",
+    #                   width=.5,
+    #               ))
     fig.update_layout(paper_bgcolor='rgba(0,0,0,0)')
     return fig
 

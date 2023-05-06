@@ -39,4 +39,5 @@ class NameMap:
     border_radius = 'border-radius'
     bg_color_fig = 'background-color'
     shadow = 'box-shadow'
-    defautl_shadow = '10px 10px 10px lightgrey'
+    defautl_shadow = '8px 8px 8px lightgrey'
+    padding_bottom = 'padding-bottom'
