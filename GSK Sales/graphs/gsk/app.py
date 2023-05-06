@@ -16,6 +16,25 @@ app = Dash(__name__)
 app.layout = layout.Dash.get()
 
 
+@app.callback(Output(layout.IDs.drop_d_sku, 'options'),
+              Output(layout.IDs.drop_d_sku, 'value'),
+              Input(layout.IDs.drop_d_brand, 'value'))
+def update_sku_drop_down(value):
+    return (d.data_dict[d.cy_key].skus_map.get(value),
+            d.data_dict[d.cy_key].skus_map.get(value)[0],
+            )
+
+
+@app.callback(Output(layout.IDs.drop_d_period_type_value, 'options'),
+              Output(layout.IDs.drop_d_period_type_value, 'value'),
+              Output(layout.IDs.drop_d_periods_label, 'children'),
+              Input(layout.IDs.radio_b_period_type, 'value'))
+def update_periods_drop_down(value):
+    return (d.data_dict[d.cy_key].periods_map.get(value),
+            d.data_dict[d.cy_key].periods_map.get(value)[0],
+            f'Selected: {value}')
+
+
 @app.callback(
     Output(layout.IDs.mtd_sales_indicator, 'figure'),
     Output(layout.IDs.qtd_sales_indicator, 'figure'),

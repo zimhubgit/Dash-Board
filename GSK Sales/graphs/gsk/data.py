@@ -47,6 +47,15 @@ class Data:
         self.dataset: pnd.DataFrame = dataset
         self.cache: Cache = Cache()
         self.last_update_on: pnd.Timestamp = pnd.Timestamp(self.dataset[nm.GSK.ColName.UPDATED_ON].values[0])
+        self.brands: list[str] = self.dataset[nm.GSK.ColName.BRAND].unique().tolist()
+        self.skus_map: dict[str, list[str]] = {brand: name[nm.GSK.ColName.SKU].unique().tolist() for (brand, name) in
+                                               self.dataset.groupby(nm.GSK.ColName.BRAND)}
+        self.periods_map: dict[str, list[str]] = {
+            'Month': ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October',
+                      'November', 'December'],
+            'Quarter': ['Qtr 1', 'Qtr 2', 'Qtr 3', 'Qtr 4'],
+            'Half Year': ['H1', 'H2'],
+            'Year': ['YTD']}
 
     def filter(self, prd_type: str, brand: str, sku: str,
                date: pnd.Timestamp, end_date: pnd.Timestamp) -> pnd.DataFrame:
