@@ -82,11 +82,10 @@ def sunburst(parents: list[str],
              values: list[float],
              colors: list[str],
              rfcs: list[float]) -> go.Figure:
-    fig = color_map_sunburst(parents=parents,
-                             labels=labels,
-                             values=values,
-                             colors=colors,
-                             rfcs=rfcs)
+    fig = heat_map_sunburst(parents=parents,
+                            labels=labels,
+                            values=values,
+                            rfcs=rfcs)
     fig.add_trace(go.Sunburst(
         values=values,
         labels=labels,
@@ -111,22 +110,22 @@ def sunburst(parents: list[str],
     return fig
 
 
-def color_map_sunburst(parents: list[str],
-                       labels: list[str],
-                       values: list[float],
-                       colors: list[str],
-                       rfcs: list[float]) -> go.Figure:
+def heat_map_sunburst(parents: list[str],
+                      labels: list[str],
+                      values: list[float],
+                      rfcs: list[float]) -> go.Figure:
     progress = [(r / rfcs[i] * 100) for i, r in enumerate(values)]
-
     fig = px.sunburst(names=labels,
                       parents=parents,
                       values=values,
                       color=progress,
                       color_continuous_scale='rdylgn',
-                      range_color=[0, 100], )
+                      range_color=[0, 100],
+                      )
     fig.update_traces({'insidetextorientation': 'radial'})
     fig.update_layout(paper_bgcolor='rgba(0,0,0,0)',
-                      margin=dict(t=0, l=0, r=0, b=30))
+                      margin=dict(t=0, l=0, r=0, b=30),
+                      coloraxis=dict(colorbar=dict(title='Achievments<Br>Rate (%)')), )
     return fig
 
 

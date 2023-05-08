@@ -518,7 +518,7 @@ class FiguresUpdater:
         data_df.sort_values(sales_as.achieved, inplace=True)
         x_labels: list[str] = data_df[nm.GSK.ColName.SKU].tolist()
         values: list[float] = data_df[sales_as.achieved].tolist()
-        text: list[str] = [f'{value:.2f} ({(value / values[-1] * 100):.2f}%)' for value in values]
+        text: list[str] = [f'{value:.2f}<Br>({(value / values[-1] * 100):.2f}%)' for value in values]
         values[-1] = 0
         measure: list[str] = ['relative' for sku in x_labels[0:-1]]
         measure.append('total')
