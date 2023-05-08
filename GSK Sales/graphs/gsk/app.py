@@ -1,6 +1,6 @@
 import os
 
-from dash import Dash, Input, Output
+from dash import Dash, Input, Output, State
 import layout
 import data as d
 
@@ -48,13 +48,11 @@ def update_periods_drop_down(value):
     Output(layout.IDs.clam_qtd_sales_indicator, 'figure'),
     Output(layout.IDs.clam_std_sales_indicator, 'figure'),
     Output(layout.IDs.clam_ytd_sales_indicator, 'figure'),
-    Output(layout.IDs.sales_repartition_sunburst, 'figure'),
-    Output(layout.IDs.sales_repartition_waterfall, 'figure'),
     Output(layout.IDs.sales_evolution_bar, 'figure'),
     Output(layout.IDs.stocks_evolution_bar, 'figure'),
     Input(layout.IDs.radio_b_sales_as, 'value'),
 )
-def update(value):
+def update_static_indicators(value):
     sales_as = d.SalesAs(value)
     return (
         layout.FiguresUpdater.update_progress_section('MTD', 'ALL', None, None,
@@ -81,11 +79,32 @@ def update(value):
                                                       sales_as),
         layout.FiguresUpdater.update_progress_section('YTD', 'CLAMOXYL', None, None,
                                                       sales_as),
-        layout.FiguresUpdater.update_sunburst_section(sales_as),
-        layout.FiguresUpdater.update_waterfall_section(sales_as),
         layout.FiguresUpdater.update_sales_evolution_bar(sales_as),
         layout.FiguresUpdater.update_stocks_evolution_bar(sales_as),
     )
+
+
+@app.callback(Output(layout.IDs.sales_repartition_waterfall, 'figure'),
+              State(layout.IDs.drop_d_brand, 'value'),
+              State(layout.IDs.radio_b_period_type, 'value'),
+              State(layout.IDs.drop_d_period_type_value, 'value'),
+              Input(layout.IDs.radio_b_sales_as, 'value'),
+              Input(layout.IDs.button_show, 'n_clicks'),
+              )
+def update_water_fall(brand, prd_type, prd, sales_as, n_clicks):
+    sales_as = d.SalesAs(sales_as)
+    return layout.FiguresUpdater.update_waterfall_section(brand, prd_type, prd, sales_as)
+
+
+@app.callback(Output(layout.IDs.sales_repartition_sunburst, 'figure'),
+              State(layout.IDs.radio_b_period_type, 'value'),
+              State(layout.IDs.drop_d_period_type_value, 'value'),
+              Input(layout.IDs.radio_b_sales_as, 'value'),
+              Input(layout.IDs.button_show, 'n_clicks'),
+              )
+def update_sunburst(prd_type, prd, sales_as, n_clicks):
+    sales_as = d.SalesAs(sales_as)
+    return layout.FiguresUpdater.update_sunburst_section(prd_type, prd, sales_as)
 
 
 app.run_server(debug=True)

@@ -51,28 +51,94 @@ class Data:
         self.skus_map: dict[str, list[str]] = {brand: name[nm.GSK.ColName.SKU].unique().tolist() for (brand, name) in
                                                self.dataset.groupby(nm.GSK.ColName.BRAND)}
         self.periods_map: dict[str, list[str]] = {
-            'Month': ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October',
-                      'November', 'December'],
-            'Quarter': ['Qtr 1', 'Qtr 2', 'Qtr 3', 'Qtr 4'],
-            'Half Year': ['H1', 'H2'],
-            'Year': ['YTD']}
+            'MTD': ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October',
+                    'November', 'December'],
+            'QTD': ['Qtr 1', 'Qtr 2', 'Qtr 3', 'Qtr 4'],
+            'STD': ['H1', 'H2'],
+            'YTD': ['YTD']}
 
-    def filter(self, prd_type: str, brand: str, sku: str,
-               date: pnd.Timestamp, end_date: pnd.Timestamp) -> pnd.DataFrame:
+    @staticmethod
+    def date_from_period(prd_type: str, prd: str) -> pnd.Timestamp:
+        date: pnd.Timestamp
+        year = int(data_dict[cy_key].year)
+        if prd_type == 'MTD':
+            if prd == 'January':
+                date = pnd.Timestamp(year=year, month=1, day=31, hour=16)
+            elif prd == 'February':
+                date = pnd.Timestamp(year=year, month=2, day=1, hour=16) + pnd.offsets.MonthEnd(1)
+            elif prd == 'March':
+                date = pnd.Timestamp(year=year, month=3, day=31, hour=16)
+            elif prd == 'April':
+                date = pnd.Timestamp(year=year, month=4, day=30, hour=16)
+            elif prd == 'May':
+                date = pnd.Timestamp(year=year, month=5, day=31, hour=16)
+            elif prd == 'June':
+                date = pnd.Timestamp(year=year, month=6, day=30, hour=16)
+            elif prd == 'July':
+                date = pnd.Timestamp(year=year, month=7, day=31, hour=16)
+            elif prd == 'August':
+                date = pnd.Timestamp(year=year, month=8, day=31, hour=16)
+            elif prd == 'September':
+                date = pnd.Timestamp(year=year, month=9, day=30, hour=16)
+            elif prd == 'October':
+                date = pnd.Timestamp(year=year, month=10, day=31, hour=16)
+            elif prd == 'November':
+                date = pnd.Timestamp(year=year, month=11, day=30, hour=16)
+            elif prd == 'December':
+                date = pnd.Timestamp(year=year, month=12, day=31, hour=16)
+            else:
+                raise Exception()
+        elif prd_type == 'QTD':
+            if prd == 'Qtr 1':
+                date = pnd.Timestamp(year=year, month=3, day=31, hour=16)
+            elif prd == 'Qtr 2':
+                date = pnd.Timestamp(year=year, month=6, day=30, hour=16)
+            elif prd == 'Qtr 3':
+                date = pnd.Timestamp(year=year, month=9, day=30, hour=16)
+            elif prd == 'Qtr 4':
+                date = pnd.Timestamp(year=year, month=12, day=31, hour=16)
+            else:
+                raise Exception()
+        elif prd_type == 'STD':
+            if prd == 'H1':
+                date = pnd.Timestamp(year=year, month=6, day=30, hour=16)
+            elif prd == 'H2':
+                date = pnd.Timestamp(year=year, month=12, day=31, hour=16)
+            else:
+                raise Exception()
+        elif prd_type == 'YTD':
+            date = pnd.Timestamp(year=year, month=12, day=31, hour=16)
+        else:
+            raise Exception()
+
+        return date
+
+    def filter(self, prd_type: str,
+               date: pnd.Timestamp,
+               sku: str = None,
+               sku_type: str | list[str] = None,
+               brand: str = None,
+               end_date: pnd.Timestamp = None) -> pnd.DataFrame:
         cached_df_key: str = f'{prd_type}:{brand}:{sku}:{str(date)}'
         cached_df = self.cache.dataset_dict.get(cached_df_key)
         if cached_df is not None and not cached_df.empty:
             return cached_df
         df: pnd.DataFrame = self.dataset.copy()
-        df = df[df[nm.GSK.ColName.PERIOD_TYPE] == prd_type]
+        if prd_type is not None:
+            df = df[df[nm.GSK.ColName.PERIOD_TYPE] == prd_type]
         if end_date is None:
             df = df[df[nm.GSK.ColName.DATE] == date]
         else:
             df = df[(df[nm.GSK.ColName.DATE] >= date) & (df[nm.GSK.ColName.DATE] <= date)]
+        if brand is not None:
+            df = df[df[nm.GSK.ColName.BRAND] == brand]
         if sku is not None:
             df = df[df[nm.GSK.ColName.SKU] == sku]
-        else:
-            df = df[df[nm.GSK.ColName.BRAND] == brand]
+        if sku_type is not None:
+            if type(sku_type) is list:
+                df = df[df[nm.GSK.ColName.SKU_TYPE].isin(sku_type)]
+            else:
+                df = df[df[nm.GSK.ColName.SKU_TYPE].str.contains(sku_type)]
         self.cache.dataset_dict.update({cached_df_key: df})
         return df
 

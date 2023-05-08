@@ -1,6 +1,6 @@
 import plotly.graph_objects as go
 import plotly.express as px
-import data
+import data as d
 import pandas as pnd
 import name_space as nm
 
@@ -11,7 +11,7 @@ def indicator(achieved: float,
               target: float,
               ly_achieved: float,
               label: str,
-              sales_as: data.SalesAs = data.SalesAs(data.SalesAs.value)) -> go.Figure:
+              sales_as: d.SalesAs = d.SalesAs(d.SalesAs.value)) -> go.Figure:
     # progress_over_time = progression_over_time_mile_stone(actual_progress=actual,
     #                                                       target_progress=target, )
     gauge_range = sorted([target, achieved, ly_achieved])[-1] * 1.1
@@ -60,8 +60,8 @@ def indicator(achieved: float,
         mode='delta',
         value=((achieved + target) / target * 100) if target != 0 else 0,
         delta={'reference': 100, 'suffix': '%',
-               'increasing': {'color': data.get_delta_color(.9)}},
-        domain={'x': [0.25, .75], 'y': [0, 0.5]}
+               'increasing': {'color': d.get_delta_color(.9)}},
+        domain={'x': [0.35, .65], 'y': [0, 0.4]},
     ))
     # fig.add_shape(type='line',
     #               x0=.1,
@@ -72,20 +72,32 @@ def indicator(achieved: float,
     #                   color="grey",
     #                   width=.5,
     #               ))
-    fig.update_layout(paper_bgcolor='rgba(0,0,0,0)')
+    fig.update_layout(paper_bgcolor='rgba(0,0,0,0)',
+                      margin=dict(t=80, l=0, r=0, b=15))
     return fig
 
 
-def sunburst() -> go.Figure:
-    fig = color_map_sunburst()
+def sunburst(parents: list[str],
+             labels: list[str],
+             values: list[float],
+             colors: list[str],
+             rfcs: list[float]) -> go.Figure:
+    fig = color_map_sunburst(parents=parents,
+                             labels=labels,
+                             values=values,
+                             colors=colors,
+                             rfcs=rfcs)
     fig.add_trace(go.Sunburst(
-        values=[1000, 2000, 3000, 6000],
-        labels=['Augmentin', 'Clamoxyl', 'Ventoline', 'Flixotide'],
-        parents=['', '', '', ''],
+        values=values,
+        labels=labels,
+        parents=parents,
         branchvalues='total',
         insidetextorientation='radial',
         textinfo='value+label+percent root',
         visible=False,
+        marker=dict(
+            colors=colors
+        )
     ))
     fig.layout.update(
         updatemenus=[go.layout.Updatemenu(
@@ -95,42 +107,61 @@ def sunburst() -> go.Figure:
                           dict(label="Repartition", method="update",
                                args=[{"visible": [False, True]}, {"title": "Repartition"}])]))])
 
-    fig.update_layout(paper_bgcolor='rgba(0,0,0,0)')
+    fig.update_layout(paper_bgcolor='rgba(0,0,0,0)', )
     return fig
 
 
-def color_map_sunburst() -> go.Figure:
-    actuals = [1000, 2000, 3000, 6000]
-    rfc = [1200, 3000, 2000, 6500]
-    progress = [(r / rfc[i] * 100) for i, r in enumerate(actuals)]
-    sunburst_df: pnd.DataFrame = pnd.DataFrame(data={'SKU': ['Augmentin', 'Clamoxyl', 'Ventoline', 'Flixotide'],
-                                                     'SALES VALUE(GBP)': actuals,
-                                                     'RFC UNIT': rfc,
-                                                     'REALISATIONS': progress})
-    fig = px.sunburst(sunburst_df, path=['SKU'],
-                      values='SALES VALUE(GBP)', color='REALISATIONS',
+def color_map_sunburst(parents: list[str],
+                       labels: list[str],
+                       values: list[float],
+                       colors: list[str],
+                       rfcs: list[float]) -> go.Figure:
+    progress = [(r / rfcs[i] * 100) for i, r in enumerate(values)]
+
+    fig = px.sunburst(names=labels,
+                      parents=parents,
+                      values=values,
+                      color=progress,
                       color_continuous_scale='rdylgn',
                       range_color=[0, 100], )
     fig.update_traces({'insidetextorientation': 'radial'})
-    fig.update_layout(paper_bgcolor='rgba(0,0,0,0)')
+    fig.update_layout(paper_bgcolor='rgba(0,0,0,0)',
+                      margin=dict(t=0, l=0, r=0, b=30))
     return fig
 
 
-def water_fall() -> go.Figure:
+def water_fall(name: str,
+               measure: list[str],
+               x_labels: list[str],
+               text: list[str],
+               values: list[float],
+               colors: list[str]) -> go.Figure:
     fig = go.Figure(go.Waterfall(
-        name="Brands", orientation="v",
-        measure=["relative", "relative", "relative", "relative", "total"],
-        x=["Augmentin", "Clamoxyl", "Ventoline", "Flixotide", 'Total'],
+        orientation="v",
+        measure=measure,
+        x=x_labels,
         textposition="outside",
-        text=["1000", "2000", "3000", "6000", "Total"],
-        y=[1000, 2000, 3000, 6000, 0],
+        text=text,
+        y=values,
         connector={"line": {"color": "rgb(63, 63, 63)"}},
     ))
-
+    # for color, y, x in zip(colors, values, x_labels):
+    #     fig.add_shape(type='rect',
+    #                   xref='x',
+    #                   yref='y',
+    #                   x0=x,
+    #                   # x1=x,
+    #                   y0=0,
+    #                   y1=y,
+    #                   # y1=y,
+    #                   label=dict(text=f"G:\n"),
+    #                   fillcolor=color)
     fig.update_layout(
-        showlegend=True
+        showlegend=False
     )
-    fig.update_layout(paper_bgcolor='rgba(0,0,0,0)')
+    fig.update_layout(title=dict(text=name),
+                      paper_bgcolor='rgba(0,0,0,0)',
+                      margin=dict(l=0, r=0))
     return fig
 
 

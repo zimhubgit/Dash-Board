@@ -173,19 +173,19 @@ class Section:
                                              },
                                              ),
                                   dcc.RadioItems(id=IDs.radio_b_period_type,
-                                                 options=[{'label': 'Months', 'value': 'Month'},
-                                                          {'label': 'Quarters', 'value': 'Quarter'},
-                                                          {'label': 'Year Halfs', 'value': 'Half Year'},
-                                                          {'label': 'Year', 'value': 'Year'},
+                                                 options=[{'label': 'Months', 'value': 'MTD'},
+                                                          {'label': 'Quarters', 'value': 'QTD'},
+                                                          {'label': 'Year Halves', 'value': 'STD'},
+                                                          {'label': 'Year', 'value': 'YTD'},
                                                           ],
-                                                 value='Month',
+                                                 value='MTD',
                                                  ),
                                   html.Br(),
                                   html.Label(id=IDs.drop_d_periods_label,
                                              children='Selected period: MTD'),
                                   dcc.Dropdown(id=IDs.drop_d_period_type_value,
-                                               options=['Period 1', 'Period 2', 'Period 3'],
-                                               value='Period 1',
+                                               options=d.data_dict[d.cy_key].periods_map.get('MTD'),
+                                               value=d.data_dict[d.cy_key].periods_map.get('MTD')[0],
                                                clearable=False,
                                                searchable=True,
                                                ),
@@ -193,7 +193,7 @@ class Section:
                                   html.Br(),
                                   html.Button(id=IDs.button_show,
                                               style={'background': '#64B5F6'},
-                                              children=['Afficher'],
+                                              children=['Submit'],
                                               n_clicks=0),
                                   ],
                         )
@@ -238,7 +238,7 @@ class Section:
                                id=sect_id,
                                style={nmap.display: nmap.flex,
                                       nmap.disposition: nmap.flex_row,
-                                      nmap.height: '320px'
+                                      nmap.height: '250px'
                                       },
                                children=[html.Div(style={nmap.opacity: '1',
                                                          nmap.width: '25%',
@@ -428,8 +428,8 @@ class FiguresUpdater:
             date = d.Data.translate_date_ytd_date(date)
             ly_date = d.Data.translate_date_ytd_date(ly_date)
 
-        cy_df = d.data_dict[d.cy_key].filter(prd_type, brand, sku, date, end_date)
-        ly_df = d.data_dict[d.ly_key].filter(prd_type, brand, sku, ly_date, end_date)
+        cy_df = d.data_dict[d.cy_key].filter(prd_type=prd_type, brand=brand, sku=sku, date=date, end_date=end_date)
+        ly_df = d.data_dict[d.ly_key].filter(prd_type=prd_type, brand=brand, sku=sku, date=ly_date, end_date=end_date)
         achieved: float = cy_df[sales_as.achieved].values[0]
         target: float = cy_df[sales_as.rfc].values[0]
         label: str = f'{prd_type} Progression : {update.day}/{update.month}/{update.year}'
@@ -439,12 +439,97 @@ class FiguresUpdater:
                              ly_achieved=ly_achievement)
 
     @staticmethod
-    def update_sunburst_section(sales_as: d.SalesAs) -> go.Figure:
-        return fig.sunburst()
+    def update_sunburst_section(prd_type: str,
+                                prd: str,
+                                sales_as: d.SalesAs) -> go.Figure:
+        date: pnd.Timestamp = d.Data.date_from_period(prd_type=prd_type, prd=prd)
+        data_df: pnd.DataFrame = d.data_dict[d.cy_key].filter(prd_type=prd_type,
+                                                              date=date).copy()
+        data_df = data_df[(~data_df[sales_as.achieved].isna()) & (data_df[sales_as.achieved] != 0.0)]
+
+        def group_by(sku_type: str):
+            if nm.GSK.Naming.SKU_SKU_TYPE == sku_type:
+                return 'children'
+            elif nm.GSK.Naming.BRAND_SKU_TYPE in sku_type:
+                return 'parent'
+            else:
+                return 'root'
+
+        skus_groups = data_df.set_index(nm.GSK.ColName.SKU_TYPE).groupby(group_by)
+        parents_dict: dict[str, pnd.DataFrame] = {}
+        for group, group_df in skus_groups:
+            parents_dict.update({str(group): group_df.sort_values(sales_as.achieved)})
+
+        children_list: list[str] = ['GSK']
+        parents_list: list[str] = ['']
+        values_list: list[float] = [parents_dict.get('root')[sales_as.achieved].values[0]]
+        colors_list: list[str] = [parents_dict.get('root')[nm.GSK.ColName.COLOR].values[0]]
+        rfc_list: list[float] = [parents_dict.get('root')[sales_as.rfc].values[0]]
+
+        parents_df: pnd.DataFrame = parents_dict.get('parent')
+        children_df: pnd.DataFrame = parents_dict.get('children')
+        for parent in parents_df[nm.GSK.ColName.SKU].tolist():
+            parents_list.append('GSK')
+            children_list.append(parent)
+            values_list.append(parents_df[parents_df[nm.GSK.ColName.SKU] == parent][sales_as.achieved].values[0])
+            colors_list.append(parents_df[parents_df[nm.GSK.ColName.SKU] == parent][nm.GSK.ColName.COLOR].values[0])
+            rfc_list.append(parents_df[parents_df[nm.GSK.ColName.SKU] == parent][sales_as.rfc].values[0])
+
+            parent_children_df = children_df[children_df[nm.GSK.ColName.BRAND] == parent]
+            if not parent_children_df.empty:
+                for child in parent_children_df[nm.GSK.ColName.SKU].tolist():
+                    parents_list.append(parent)
+                    children_list.append(child)
+                    values_list.append(
+                        parent_children_df[parent_children_df[nm.GSK.ColName.SKU] == child][sales_as.achieved].values[
+                            0])
+                    colors_list.append(
+                        parent_children_df[parent_children_df[nm.GSK.ColName.SKU] == child][
+                            nm.GSK.ColName.COLOR].values[
+                            0])
+                    rfc_list.append(
+                        parent_children_df[parent_children_df[nm.GSK.ColName.SKU] == child][sales_as.rfc].values[
+                            0])
+        return fig.sunburst(parents=parents_list,
+                            labels=children_list,
+                            values=values_list,
+                            colors=colors_list,
+                            rfcs=rfc_list)
 
     @staticmethod
-    def update_waterfall_section(sales_as: d.SalesAs) -> go.Figure:
-        return fig.water_fall()
+    def update_waterfall_section(brand: str,
+                                 prd_type: str,
+                                 prd: str,
+                                 sales_as: d.SalesAs) -> go.Figure:
+        date: pnd.Timestamp = d.Data.date_from_period(prd_type=prd_type, prd=prd)
+        data_df: pnd.DataFrame
+        if brand == nm.GSK.Naming.ALL_SKUs:
+            data_df = d.data_dict[d.cy_key].filter(prd_type=prd_type,
+                                                   sku_type=[nm.GSK.Naming.BRAND_SKU_TYPE,
+                                                             nm.GSK.Naming.ALL_SKUs,
+                                                             nm.GSK.Naming.SKU_BRAND_SKU_TYPE],
+                                                   date=date).copy()
+        else:
+            data_df = d.data_dict[d.cy_key].filter(prd_type=prd_type,
+                                                   brand=brand,
+                                                   date=date).copy()
+
+        data_df = data_df[(~data_df[sales_as.achieved].isna()) & (data_df[sales_as.achieved] != 0.0)]
+        data_df.sort_values(sales_as.achieved, inplace=True)
+        x_labels: list[str] = data_df[nm.GSK.ColName.SKU].tolist()
+        values: list[float] = data_df[sales_as.achieved].tolist()
+        text: list[str] = [f'{value:.2f} ({(value / values[-1] * 100):.2f}%)' for value in values]
+        values[-1] = 0
+        measure: list[str] = ['relative' for sku in x_labels[0:-1]]
+        measure.append('total')
+        colors: list[str] = data_df[nm.GSK.ColName.COLOR].tolist()
+        name: str = f'{brand}: {sales_as.name} | {prd}'
+        return fig.water_fall(name=name,
+                              measure=measure,
+                              x_labels=x_labels,
+                              text=text,
+                              values=values,
+                              colors=colors)
 
     @staticmethod
     def update_sales_evolution_bar(sales_as: d.SalesAs) -> go.Figure:
