@@ -192,10 +192,9 @@ def sales_hist_bar(months: list[pnd.Timestamp],
                    targets: list[float],
                    cy_actuals: list[float],
                    ly_actuals: list[float],
-                   sku: str = None,
-                   sales_as: d.SalesAs = None) -> go.Figure:
-    # months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-    #           'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+                   ) -> go.Figure:
+    months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+              'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
     # targets = [25, 14, 26, 15, 20, 20, 16, 15, 12, 16, 14, 17]
     # actuals = [20, 14, 25, 16, 18, 22, 19, 15, 12, 16, 14, 17]
     # ly_actuals = [19, 14, 22, 14, 16, 19, 15, 14, 10, 12, 12, 16]
@@ -207,7 +206,7 @@ def sales_hist_bar(months: list[pnd.Timestamp],
         name='2023',
         marker_color=nm.NameMap.solid_gsk_orange
     ))
-    for idx, month in enumerate(months):
+    for idx, month in enumerate(months[:len(targets)]):
         fig.add_shape(type='line',
                       xref='x',
                       yref='y',
@@ -220,7 +219,7 @@ def sales_hist_bar(months: list[pnd.Timestamp],
                           width=2,
                       ),
                       )
-        growth = (cy_actuals[idx] - ly_actuals[idx]) / ly_actuals[idx]
+        growth = (cy_actuals[idx] - ly_actuals[idx]) / ly_actuals[idx] if ly_actuals[idx] != 0 else 0
         fig.add_shape(type="rect",
                       xref='x', yref='y',
                       fillcolor=nm.NameMap.rgba(198, 244, 229, 0.94) if growth > 0.03 else nm.NameMap.rgba(244, 198,

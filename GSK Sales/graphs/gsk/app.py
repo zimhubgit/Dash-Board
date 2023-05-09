@@ -119,6 +119,7 @@ def update_stock_bars(prd_type, prd, sku, n_clicks):
               Input(layout.IDs.button_show, 'n_clicks'),
               )
 def update_achievements_hist_bars(sku, sales_as, n_clicks):
+    sales_as = d.SalesAs(sales_as)
     return layout.FiguresUpdater.update_sales_evolution_bar(sku, sales_as)
 
 

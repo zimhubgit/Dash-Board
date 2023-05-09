@@ -534,15 +534,24 @@ class FiguresUpdater:
     @staticmethod
     def update_sales_evolution_bar(sku: str = None,
                                    sales_as: d.SalesAs = None) -> go.Figure:
-        start_date: pnd.Timestamp = d.Data.date_from_period(prd_type='YTD', prd=None, start_date=True)
-        end_date: pnd.Timestamp = d.Data.date_from_period(prd_type='YTD', prd=None)
+        cy_start_date: pnd.Timestamp = d.Data.date_from_period(prd_type='YTD',
+                                                               prd=None,
+                                                               start_date=True)
+        cy_end_date: pnd.Timestamp = d.Data.date_from_period(prd_type='YTD',
+                                                             prd=None)
         data_df_cy = d.data_dict[d.cy_key].filter(prd_type='MONTHLY',
-                                                  date=start_date,
-                                                  end_date=end_date,
+                                                  date=cy_start_date,
+                                                  end_date=cy_end_date,
                                                   sku=sku)
+        ly_start_date: pnd.Timestamp = d.Data.date_from_period(prd_type='YTD',
+                                                               prd=None,
+                                                               start_date=True,
+                                                               current_year=False)
+        ly_end_date: pnd.Timestamp = d.Data.date_from_period(prd_type='YTD', prd=None,
+                                                             current_year=False)
         data_df_ly = d.data_dict[d.ly_key].filter(prd_type='MONTHLY',
-                                                  date=start_date,
-                                                  end_date=end_date,
+                                                  date=ly_start_date,
+                                                  end_date=ly_end_date,
                                                   sku=sku)
         data_df_cy = data_df_cy.sort_values(by=nm.GSK.ColName.DATE)
         data_df_ly = data_df_ly.sort_values(by=nm.GSK.ColName.DATE)
@@ -554,8 +563,7 @@ class FiguresUpdater:
                                   targets=targets,
                                   cy_actuals=cy_actuals,
                                   ly_actuals=ly_actuals,
-                                  sku=sku,
-                                  sales_as=sales_as)
+                                  )
 
     @staticmethod
     def update_stocks_evolution_bar(prd_type: str,

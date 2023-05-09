@@ -59,9 +59,15 @@ class Data:
         }
 
     @staticmethod
-    def date_from_period(prd_type: str, prd: str | None, start_date: bool = False) -> pnd.Timestamp:
-        year = int(data_dict[cy_key].year)
-        date: pnd.Timestamp = pnd.Timestamp(year=year, month=1, day=1, hour=16)
+    def date_from_period(prd_type: str,
+                         prd: str | None,
+                         start_date: bool = False,
+                         current_year: bool = True) -> pnd.Timestamp:
+        if current_year:
+            current_year = int(data_dict[cy_key].year)
+        else:
+            current_year = int(data_dict[ly_key].year)
+        date: pnd.Timestamp = pnd.Timestamp(year=current_year, month=1, day=1, hour=16)
         if prd_type == 'MTD':
             if prd == 'January':
                 pass
