@@ -544,11 +544,12 @@ class FiguresUpdater:
                                                   date=start_date,
                                                   end_date=end_date,
                                                   sku=sku)
-
-        months: list[pnd.Timestamp]
-        targets: list[float]
-        cy_actuals: list[float]
-        ly_actuals: list[float]
+        data_df_cy = data_df_cy.sort_values(by=nm.GSK.ColName.DATE)
+        data_df_ly = data_df_ly.sort_values(by=nm.GSK.ColName.DATE)
+        months: list[pnd.Timestamp] = data_df_ly[nm.GSK.ColName.DATE].tolist()
+        targets: list[float] = data_df_cy[sales_as.rfc].tolist()
+        cy_actuals: list[float] = data_df_cy[sales_as.achieved].tolist()
+        ly_actuals: list[float] = data_df_ly[sales_as.achieved].tolist()
         return fig.sales_hist_bar(months=months,
                                   targets=targets,
                                   cy_actuals=cy_actuals,
