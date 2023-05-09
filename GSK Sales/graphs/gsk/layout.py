@@ -541,10 +541,14 @@ class FiguresUpdater:
                                     sku: str = None) -> go.Figure:
         start_date: pnd.Timestamp = d.Data.date_from_period(prd_type=prd_type, prd=prd, start_date=True)
         end_date: pnd.Timestamp = d.Data.date_from_period(prd_type=prd_type, prd=prd)
-        d.data_dict[d.cy_key].filter(prd_type='WEEKLY',
-                                     date=start_date,
-                                     end_date=end_date,
-                                     sku=sku)
-        return fig.stocks_hist_bar(weeks=None,
-                                   quarantine_y=None,
-                                   available_y=None)
+        data_df = d.data_dict[d.cy_key].filter(prd_type='WEEKLY',
+                                               date=start_date,
+                                               end_date=end_date,
+                                               sku=sku)
+        data_df = data_df.sort_values(by=nm.GSK.ColName.DATE)
+        weeks: list[pnd.Timestamp] = data_df[nm.GSK.ColName.DATE].tolist()
+        quarantine_values = data_df[nm.GSK.ColName.QUARANTINE_STOCK].tolist()
+        available_values = data_df[nm.GSK.ColName.AVAILABLE_STOCK].tolist()
+        return fig.stocks_hist_bar(weeks=weeks,
+                                   quarantine_y=quarantine_values,
+                                   available_y=available_values)

@@ -2,6 +2,7 @@ import plotly.graph_objects as go
 import plotly.express as px
 import data as d
 import name_space as nm
+import pandas as pnd
 
 figures_cache: dict[str, go.Figure] = {}
 
@@ -163,13 +164,13 @@ def water_fall(name: str,
     return fig
 
 
-def stocks_hist_bar(weeks: list[str],
+def stocks_hist_bar(weeks: list[pnd.Timestamp],
                     quarantine_y: list[int],
                     available_y: list[int]) -> go.Figure:
-    weeks = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-             'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-    quarantine_y = [20, 14, 25, 16, 18, 22, 19, 15, 12, 16, 14, 17]
-    available_y = [19, 14, 22, 14, 16, 19, 15, 14, 10, 12, 12, 16]
+    # weeks = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+    #          'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+    # quarantine_y = [20, 14, 25, 16, 18, 22, 19, 15, 12, 16, 14, 17]
+    # available_y = [19, 14, 22, 14, 16, 19, 15, 14, 10, 12, 12, 16]
 
     fig = go.Figure()
     quarantine_bar_trace: go.Bar = go.Bar(

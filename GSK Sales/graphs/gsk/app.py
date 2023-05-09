@@ -100,7 +100,7 @@ def update_water_fall(brand, prd_type, prd, sales_as, n_clicks):
               Input(layout.IDs.radio_b_sales_as, 'value'),
               Input(layout.IDs.button_show, 'n_clicks'),
               )
-def update_sunburst(prd_type, prd, sales_as):
+def update_sunburst(prd_type, prd, sales_as, n_clicks):
     sales_as = d.SalesAs(sales_as)
     return layout.FiguresUpdater.update_sunburst_section(prd_type, prd, sales_as)
 
@@ -111,7 +111,7 @@ def update_sunburst(prd_type, prd, sales_as):
               State(layout.IDs.drop_d_sku, 'value'),
               Input(layout.IDs.button_show, 'n_clicks'),
               )
-def update_stock_bars(prd_type, prd):
+def update_stock_bars(prd_type, prd, sku, n_clicks):
     return layout.FiguresUpdater.update_stocks_evolution_bar(prd_type, prd, sku)
 
 

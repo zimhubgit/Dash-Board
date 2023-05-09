@@ -25,6 +25,8 @@ class GSK:
         NSP = 'NSP'
         UPDATED_ON = 'LAST UPDATE'
         INPUT_DATA_COLUMNS = [SKU, RFC_VALUE_COL, RFC_UNIT_COL, NSP, UNIT_SALES, VALUE_SALES]
+        QUARANTINE_STOCK = 'Stock Quarantaine (Non libéré)'
+        AVAILABLE_STOCK = 'Stock Vendable (Libéré)'
 
     class Naming:
         END_COL = 'FEU'
