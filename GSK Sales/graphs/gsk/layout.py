@@ -536,9 +536,15 @@ class FiguresUpdater:
         return fig.sales_hist_bar()
 
     @staticmethod
-    def update_stocks_evolution_bar(prd_type: str, prd: str) -> go.Figure:
+    def update_stocks_evolution_bar(prd_type: str,
+                                    prd: str,
+                                    sku: str = None) -> go.Figure:
+        start_date: pnd.Timestamp = d.Data.date_from_period(prd_type=prd_type, prd=prd, start_date=True)
         end_date: pnd.Timestamp = d.Data.date_from_period(prd_type=prd_type, prd=prd)
-
+        d.data_dict[d.cy_key].filter(prd_type='WEEKLY',
+                                     date=start_date,
+                                     end_date=end_date,
+                                     sku=sku)
         return fig.stocks_hist_bar(weeks=None,
                                    quarantine_y=None,
                                    available_y=None)
