@@ -536,5 +536,9 @@ class FiguresUpdater:
         return fig.sales_hist_bar()
 
     @staticmethod
-    def update_stocks_evolution_bar(sales_as: d.SalesAs) -> go.Figure:
-        return fig.stocks_hist_bar()
+    def update_stocks_evolution_bar(prd_type: str, prd: str) -> go.Figure:
+        end_date: pnd.Timestamp = d.Data.date_from_period(prd_type=prd_type, prd=prd)
+
+        return fig.stocks_hist_bar(weeks=None,
+                                   quarantine_y=None,
+                                   available_y=None)

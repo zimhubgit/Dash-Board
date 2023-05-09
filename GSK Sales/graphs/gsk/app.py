@@ -49,7 +49,6 @@ def update_periods_drop_down(value):
     Output(layout.IDs.clam_std_sales_indicator, 'figure'),
     Output(layout.IDs.clam_ytd_sales_indicator, 'figure'),
     Output(layout.IDs.sales_evolution_bar, 'figure'),
-    Output(layout.IDs.stocks_evolution_bar, 'figure'),
     Input(layout.IDs.radio_b_sales_as, 'value'),
 )
 def update_static_indicators(value):
@@ -80,7 +79,6 @@ def update_static_indicators(value):
         layout.FiguresUpdater.update_progress_section('YTD', 'CLAMOXYL', None, None,
                                                       sales_as),
         layout.FiguresUpdater.update_sales_evolution_bar(sales_as),
-        layout.FiguresUpdater.update_stocks_evolution_bar(sales_as),
     )
 
 
@@ -102,9 +100,18 @@ def update_water_fall(brand, prd_type, prd, sales_as, n_clicks):
               Input(layout.IDs.radio_b_sales_as, 'value'),
               Input(layout.IDs.button_show, 'n_clicks'),
               )
-def update_sunburst(prd_type, prd, sales_as, n_clicks):
+def update_sunburst(prd_type, prd, sales_as):
     sales_as = d.SalesAs(sales_as)
     return layout.FiguresUpdater.update_sunburst_section(prd_type, prd, sales_as)
+
+
+@app.callback(Output(layout.IDs.stocks_evolution_bar, 'figure'),
+              State(layout.IDs.radio_b_period_type, 'value'),
+              State(layout.IDs.drop_d_period_type_value, 'value'),
+              Input(layout.IDs.button_show, 'n_clicks'),
+              )
+def update_stock_bars(prd_type, prd):
+    return layout.FiguresUpdater.update_stocks_evolution_bar(prd_type, prd)
 
 
 app.run_server(debug=True)

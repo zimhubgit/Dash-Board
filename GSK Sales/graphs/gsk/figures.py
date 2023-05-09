@@ -1,7 +1,6 @@
 import plotly.graph_objects as go
 import plotly.express as px
 import data as d
-import pandas as pnd
 import name_space as nm
 
 figures_cache: dict[str, go.Figure] = {}
@@ -14,7 +13,7 @@ def indicator(achieved: float,
               sales_as: d.SalesAs = d.SalesAs(d.SalesAs.value)) -> go.Figure:
     # progress_over_time = progression_over_time_mile_stone(actual_progress=actual,
     #                                                       target_progress=target, )
-    gauge_range = sorted([target, achieved, ly_achieved])[-1] * 1.1
+    gauge_range = sorted([target, achieved, ly_achieved])[-1] * 1.04
     fig = go.Figure()
     fig.add_trace(go.Indicator(
         mode="number+gauge+delta", value=achieved,
@@ -164,21 +163,26 @@ def water_fall(name: str,
     return fig
 
 
-def stocks_hist_bar() -> go.Figure:
-    months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-              'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+def stocks_hist_bar(weeks: list[str],
+                    quarantine_y: list[int],
+                    available_y: list[int]) -> go.Figure:
+    weeks = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+             'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+    quarantine_y = [20, 14, 25, 16, 18, 22, 19, 15, 12, 16, 14, 17]
+    available_y = [19, 14, 22, 14, 16, 19, 15, 14, 10, 12, 12, 16]
 
     fig = go.Figure()
-    fig.add_trace(go.Bar(
-        x=months,
-        y=[20, 14, 25, 16, 18, 22, 19, 15, 12, 16, 14, 17],
-        name='Available Stock',
+    quarantine_bar_trace: go.Bar = go.Bar(
+        x=weeks,
+        y=quarantine_y,
+        name='Quarantine Stock',
         marker_color='indianred'
-    ))
+    )
+    fig.add_trace(quarantine_bar_trace)
     fig.add_trace(go.Bar(
-        x=months,
-        y=[19, 14, 22, 14, 16, 19, 15, 14, 10, 12, 12, 16],
-        name='Quarentain Stock',
+        x=weeks,
+        y=available_y,
+        name='Available Stock',
         marker_color='lightsalmon'
     ))
 

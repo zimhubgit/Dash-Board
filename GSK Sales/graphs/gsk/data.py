@@ -58,59 +58,68 @@ class Data:
             'YTD': ['YTD']}
 
     @staticmethod
-    def date_from_period(prd_type: str, prd: str) -> pnd.Timestamp:
-        date: pnd.Timestamp
+    def date_from_period(prd_type: str, prd: str, start_date: bool = False) -> pnd.Timestamp:
         year = int(data_dict[cy_key].year)
+        date: pnd.Timestamp = pnd.Timestamp(year=year, month=1, day=1, hour=16)
         if prd_type == 'MTD':
             if prd == 'January':
-                date = pnd.Timestamp(year=year, month=1, day=31, hour=16)
+                pass
             elif prd == 'February':
-                date = pnd.Timestamp(year=year, month=2, day=1, hour=16) + pnd.offsets.MonthEnd(1)
+                date = date.replace(month=2)
             elif prd == 'March':
-                date = pnd.Timestamp(year=year, month=3, day=31, hour=16)
+                date = date.replace(month=3)
             elif prd == 'April':
-                date = pnd.Timestamp(year=year, month=4, day=30, hour=16)
+                date = date.replace(month=4)
             elif prd == 'May':
-                date = pnd.Timestamp(year=year, month=5, day=31, hour=16)
+                date = date.replace(month=5)
             elif prd == 'June':
-                date = pnd.Timestamp(year=year, month=6, day=30, hour=16)
+                date = date.replace(month=6)
             elif prd == 'July':
-                date = pnd.Timestamp(year=year, month=7, day=31, hour=16)
+                date = date.replace(month=7)
             elif prd == 'August':
-                date = pnd.Timestamp(year=year, month=8, day=31, hour=16)
+                date = date.replace(month=8)
             elif prd == 'September':
-                date = pnd.Timestamp(year=year, month=9, day=30, hour=16)
+                date = date.replace(month=9)
             elif prd == 'October':
-                date = pnd.Timestamp(year=year, month=10, day=31, hour=16)
+                date = date.replace(month=10)
             elif prd == 'November':
-                date = pnd.Timestamp(year=year, month=11, day=30, hour=16)
+                date = date.replace(month=11)
             elif prd == 'December':
-                date = pnd.Timestamp(year=year, month=12, day=31, hour=16)
+                date = date.replace(month=12)
             else:
                 raise Exception()
+            if not start_date:
+                date = date + pnd.offsets.MonthEnd(1)
         elif prd_type == 'QTD':
             if prd == 'Qtr 1':
-                date = pnd.Timestamp(year=year, month=3, day=31, hour=16)
+                pass
             elif prd == 'Qtr 2':
-                date = pnd.Timestamp(year=year, month=6, day=30, hour=16)
+                date = date.replace(month=4)
             elif prd == 'Qtr 3':
-                date = pnd.Timestamp(year=year, month=9, day=30, hour=16)
+                date = date.replace(month=7)
             elif prd == 'Qtr 4':
-                date = pnd.Timestamp(year=year, month=12, day=31, hour=16)
+                date = date.replace(month=10)
             else:
                 raise Exception()
+            if not start_date:
+                date = date + pnd.offsets.QuarterEnd(1)
         elif prd_type == 'STD':
             if prd == 'H1':
-                date = pnd.Timestamp(year=year, month=6, day=30, hour=16)
+                pass
             elif prd == 'H2':
-                date = pnd.Timestamp(year=year, month=12, day=31, hour=16)
+                date = date.replace(month=7)
             else:
                 raise Exception()
+            if not start_date:
+                date = date + pnd.offsets.QuarterEnd(1) + pnd.offsets.QuarterEnd(1)
         elif prd_type == 'YTD':
-            date = pnd.Timestamp(year=year, month=12, day=31, hour=16)
+            if not start_date:
+                date = date.replace(month=12, day=31)
+            pass
         else:
             raise Exception()
-
+        if not start_date:
+            date.replace(month=12, day=31)
         return date
 
     def filter(self, prd_type: str,
