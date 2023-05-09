@@ -55,10 +55,11 @@ class Data:
                     'November', 'December'],
             'QTD': ['Qtr 1', 'Qtr 2', 'Qtr 3', 'Qtr 4'],
             'STD': ['H1', 'H2'],
-            'YTD': ['YTD']}
+            'YTD': ['YTD'],
+        }
 
     @staticmethod
-    def date_from_period(prd_type: str, prd: str, start_date: bool = False) -> pnd.Timestamp:
+    def date_from_period(prd_type: str, prd: str | None, start_date: bool = False) -> pnd.Timestamp:
         year = int(data_dict[cy_key].year)
         date: pnd.Timestamp = pnd.Timestamp(year=year, month=1, day=1, hour=16)
         if prd_type == 'MTD':
@@ -138,7 +139,7 @@ class Data:
         if end_date is None:
             df = df[df[nm.GSK.ColName.DATE] == date]
         else:
-            df = df[(df[nm.GSK.ColName.DATE] >= date) & (df[nm.GSK.ColName.DATE] <= date)]
+            df = df[(df[nm.GSK.ColName.DATE] >= date) & (df[nm.GSK.ColName.DATE] <= end_date)]
         if brand is not None:
             df = df[df[nm.GSK.ColName.BRAND] == brand]
         if sku is not None:

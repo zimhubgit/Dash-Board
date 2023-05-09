@@ -164,24 +164,19 @@ def water_fall(name: str,
     return fig
 
 
-def stocks_hist_bar(weeks: list[pnd.Timestamp],
+def stocks_hist_bar(time: list[pnd.Timestamp],
                     quarantine_y: list[int],
                     available_y: list[int]) -> go.Figure:
-    # weeks = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-    #          'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-    # quarantine_y = [20, 14, 25, 16, 18, 22, 19, 15, 12, 16, 14, 17]
-    # available_y = [19, 14, 22, 14, 16, 19, 15, 14, 10, 12, 12, 16]
-
     fig = go.Figure()
     quarantine_bar_trace: go.Bar = go.Bar(
-        x=weeks,
+        x=time,
         y=quarantine_y,
         name='Quarantine Stock',
         marker_color='indianred'
     )
     fig.add_trace(quarantine_bar_trace)
     fig.add_trace(go.Bar(
-        x=weeks,
+        x=time,
         y=available_y,
         name='Available Stock',
         marker_color='lightsalmon'
@@ -193,17 +188,22 @@ def stocks_hist_bar(weeks: list[pnd.Timestamp],
     return fig
 
 
-def sales_hist_bar() -> go.Figure:
-    months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-              'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-    targets = [25, 14, 26, 15, 20, 20, 16, 15, 12, 16, 14, 17]
-    actuals = [20, 14, 25, 16, 18, 22, 19, 15, 12, 16, 14, 17]
-    ly_actuals = [19, 14, 22, 14, 16, 19, 15, 14, 10, 12, 12, 16]
+def sales_hist_bar(months: list[pnd.Timestamp],
+                   targets: list[float],
+                   cy_actuals: list[float],
+                   ly_actuals: list[float],
+                   sku: str = None,
+                   sales_as: d.SalesAs = None) -> go.Figure:
+    # months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+    #           'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+    # targets = [25, 14, 26, 15, 20, 20, 16, 15, 12, 16, 14, 17]
+    # actuals = [20, 14, 25, 16, 18, 22, 19, 15, 12, 16, 14, 17]
+    # ly_actuals = [19, 14, 22, 14, 16, 19, 15, 14, 10, 12, 12, 16]
 
     fig = go.Figure()
     fig.add_trace(go.Bar(
         x=months,
-        y=actuals,
+        y=cy_actuals,
         name='2023',
         marker_color=nm.NameMap.solid_gsk_orange
     ))
@@ -220,7 +220,7 @@ def sales_hist_bar() -> go.Figure:
                           width=2,
                       ),
                       )
-        growth = (actuals[idx] - ly_actuals[idx]) / ly_actuals[idx]
+        growth = (cy_actuals[idx] - ly_actuals[idx]) / ly_actuals[idx]
         fig.add_shape(type="rect",
                       xref='x', yref='y',
                       fillcolor=nm.NameMap.rgba(198, 244, 229, 0.94) if growth > 0.03 else nm.NameMap.rgba(244, 198,

@@ -48,7 +48,6 @@ def update_periods_drop_down(value):
     Output(layout.IDs.clam_qtd_sales_indicator, 'figure'),
     Output(layout.IDs.clam_std_sales_indicator, 'figure'),
     Output(layout.IDs.clam_ytd_sales_indicator, 'figure'),
-    Output(layout.IDs.sales_evolution_bar, 'figure'),
     Input(layout.IDs.radio_b_sales_as, 'value'),
 )
 def update_static_indicators(value):
@@ -78,7 +77,6 @@ def update_static_indicators(value):
                                                       sales_as),
         layout.FiguresUpdater.update_progress_section('YTD', 'CLAMOXYL', None, None,
                                                       sales_as),
-        layout.FiguresUpdater.update_sales_evolution_bar(sales_as),
     )
 
 
@@ -113,6 +111,15 @@ def update_sunburst(prd_type, prd, sales_as, n_clicks):
               )
 def update_stock_bars(prd_type, prd, sku, n_clicks):
     return layout.FiguresUpdater.update_stocks_evolution_bar(prd_type, prd, sku)
+
+
+@app.callback(Output(layout.IDs.sales_evolution_bar, 'figure'),
+              State(layout.IDs.drop_d_sku, 'value'),
+              Input(layout.IDs.radio_b_sales_as, 'value'),
+              Input(layout.IDs.button_show, 'n_clicks'),
+              )
+def update_achievements_hist_bars(sku, sales_as, n_clicks):
+    return layout.FiguresUpdater.update_sales_evolution_bar(sku, sales_as)
 
 
 app.run_server(debug=True)

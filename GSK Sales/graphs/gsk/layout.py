@@ -532,8 +532,29 @@ class FiguresUpdater:
                               colors=colors)
 
     @staticmethod
-    def update_sales_evolution_bar(sales_as: d.SalesAs) -> go.Figure:
-        return fig.sales_hist_bar()
+    def update_sales_evolution_bar(sku: str = None,
+                                   sales_as: d.SalesAs = None) -> go.Figure:
+        start_date: pnd.Timestamp = d.Data.date_from_period(prd_type='YTD', prd=None, start_date=True)
+        end_date: pnd.Timestamp = d.Data.date_from_period(prd_type='YTD', prd=None)
+        data_df_cy = d.data_dict[d.cy_key].filter(prd_type='MONTHLY',
+                                                  date=start_date,
+                                                  end_date=end_date,
+                                                  sku=sku)
+        data_df_ly = d.data_dict[d.ly_key].filter(prd_type='MONTHLY',
+                                                  date=start_date,
+                                                  end_date=end_date,
+                                                  sku=sku)
+
+        months: list[pnd.Timestamp]
+        targets: list[float]
+        cy_actuals: list[float]
+        ly_actuals: list[float]
+        return fig.sales_hist_bar(months=months,
+                                  targets=targets,
+                                  cy_actuals=cy_actuals,
+                                  ly_actuals=ly_actuals,
+                                  sku=sku,
+                                  sales_as=sales_as)
 
     @staticmethod
     def update_stocks_evolution_bar(prd_type: str,
@@ -541,14 +562,14 @@ class FiguresUpdater:
                                     sku: str = None) -> go.Figure:
         start_date: pnd.Timestamp = d.Data.date_from_period(prd_type=prd_type, prd=prd, start_date=True)
         end_date: pnd.Timestamp = d.Data.date_from_period(prd_type=prd_type, prd=prd)
-        data_df = d.data_dict[d.cy_key].filter(prd_type='WEEKLY',
+        data_df = d.data_dict[d.cy_key].filter(prd_type='DAILY',
                                                date=start_date,
                                                end_date=end_date,
                                                sku=sku)
         data_df = data_df.sort_values(by=nm.GSK.ColName.DATE)
-        weeks: list[pnd.Timestamp] = data_df[nm.GSK.ColName.DATE].tolist()
+        time: list[pnd.Timestamp] = data_df[nm.GSK.ColName.DATE].tolist()
         quarantine_values = data_df[nm.GSK.ColName.QUARANTINE_STOCK].tolist()
         available_values = data_df[nm.GSK.ColName.AVAILABLE_STOCK].tolist()
-        return fig.stocks_hist_bar(weeks=weeks,
+        return fig.stocks_hist_bar(time=time,
                                    quarantine_y=quarantine_values,
                                    available_y=available_values)
