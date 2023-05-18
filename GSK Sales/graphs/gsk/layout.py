@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from dash import html, dcc
 import plotly.graph_objects as go
 import figures as fig
@@ -185,7 +187,7 @@ class Section:
                                              children='Selected period: MTD'),
                                   dcc.Dropdown(id=IDs.drop_d_period_type_value,
                                                options=d.data_dict[d.cy_key].periods_map.get('MTD'),
-                                               value=d.data_dict[d.cy_key].periods_map.get('MTD')[0],
+                                               value=d.data_dict[d.cy_key].periods_map.get('MTD')[-1],
                                                clearable=False,
                                                searchable=True,
                                                ),
@@ -442,7 +444,11 @@ class FiguresUpdater:
     def update_sunburst_section(prd_type: str,
                                 prd: str,
                                 sales_as: d.SalesAs) -> go.Figure:
-        date: pnd.Timestamp = d.Data.date_from_period(prd_type=prd_type, prd=prd)
+        last_update_date: pnd.Timestamp = d.data_dict[d.cy_key].last_update_on
+        if prd_type == 'MTD' and datetime.strptime(prd, "%B").month >= last_update_date.month:
+            date: pnd.Timestamp = last_update_date
+        else:
+            date: pnd.Timestamp = d.Data.date_from_period(prd_type=prd_type, prd=prd)
         data_df: pnd.DataFrame = d.data_dict[d.cy_key].filter(prd_type=prd_type,
                                                               date=date).copy()
         data_df = data_df[(~data_df[sales_as.achieved].isna()) & (data_df[sales_as.achieved] != 0.0)]
@@ -501,7 +507,11 @@ class FiguresUpdater:
                                  prd_type: str,
                                  prd: str,
                                  sales_as: d.SalesAs) -> go.Figure:
-        date: pnd.Timestamp = d.Data.date_from_period(prd_type=prd_type, prd=prd)
+        last_update_date: pnd.Timestamp = d.data_dict[d.cy_key].last_update_on
+        if prd_type == 'MTD' and datetime.strptime(prd, "%B").month >= last_update_date.month:
+            date: pnd.Timestamp = last_update_date
+        else:
+            date: pnd.Timestamp = d.Data.date_from_period(prd_type=prd_type, prd=prd)
         data_df: pnd.DataFrame
         if brand == nm.GSK.Naming.ALL_SKUs:
             data_df = d.data_dict[d.cy_key].filter(prd_type=prd_type,

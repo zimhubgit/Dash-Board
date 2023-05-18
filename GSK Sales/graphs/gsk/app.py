@@ -3,6 +3,7 @@ import os
 from dash import Dash, Input, Output, State
 import layout
 import data as d
+import dash_auth
 
 current_dir = os.path.abspath(os.curdir)
 parent_dir = os.path.abspath(os.path.join(current_dir, os.pardir))
@@ -12,7 +13,16 @@ GSK_SALES_DIR: str = f'{grandparent_dir}{os.sep}output'
 GSK_SALES_FILE_NAME: str = f'{GSK_SALES_DIR}{os.sep}GSK SALES.xlsx'
 d.load(GSK_SALES_FILE_NAME)
 
+VALID_USERNAME_PASSWORD_PAIRS = {
+    'hello': 'world'
+}
+
 app = Dash(__name__)
+auth = dash_auth.BasicAuth(
+    app,
+    VALID_USERNAME_PASSWORD_PAIRS
+)
+
 app.layout = layout.Dash.get()
 
 

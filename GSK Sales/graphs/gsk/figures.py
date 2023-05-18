@@ -206,30 +206,37 @@ def sales_hist_bar(months: list[pnd.Timestamp],
         name='2023',
         marker_color=nm.NameMap.solid_gsk_orange
     ))
+    y_ref = max([max(cy_actuals), max(ly_actuals)])
+    y0 = y_ref * .1
+    y1 = y_ref * .2
     for idx, month in enumerate(months[:len(targets)]):
         fig.add_shape(type='line',
                       xref='x',
                       yref='y',
-                      x0=idx - .9 / 2,
+                      x0=(idx - .9 / 2),
                       y0=targets[idx],
-                      x1=idx + .9 / 14,
+                      x1=(idx + .9 / 14),
                       y1=targets[idx],
-                      line=dict(
-                          color="red",
-                          width=2,
-                      ),
+                      line=dict(color="blue",
+                                width=2,
+                                ),
                       )
         growth = (cy_actuals[idx] - ly_actuals[idx]) / ly_actuals[idx] if ly_actuals[idx] != 0 else 0
+
         fig.add_shape(type="rect",
-                      xref='x', yref='y',
+                      xref='x',
+                      yref='y',
                       fillcolor=nm.NameMap.rgba(198, 244, 229, 0.94) if growth > 0.03 else nm.NameMap.rgba(244, 198,
                                                                                                            198, .94),
-                      line=dict(color='seagreen' if growth > 0.03 else 'red'),
-                      x0=idx - .9 / 2,
-                      y0=1,
-                      x1=idx + .9 / 2,
-                      y1=3,
-                      label=dict(text=f"G:\n{growth:.2f}"), )
+                      line=dict(color='seagreen' if growth > 0.03 else 'red',
+                                ),
+                      x0=(idx - .9 / 2),
+                      y0=y0,
+                      x1=(idx + .9 / 2),
+                      y1=y1,
+                      label=dict(text=f"G:\n{growth:.2f}",
+                                 ),
+                      )
     fig.add_trace(go.Bar(
         x=months,
         y=ly_actuals,
