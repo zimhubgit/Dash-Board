@@ -339,10 +339,11 @@ class GskSales:
     def _11_set_year_sales_df(self):
         monthly_sales_df: pnd.DataFrame = self.gsk_dataset_df[
             self.gsk_dataset_df[GSK.ColName.PERIOD_TYPE] == GSK.Naming.PERIOD_TYPE_MONTHLY].copy()
-        year_sales_df = monthly_sales_df.groupby(GSK.ColName.SKU).resample(rule='Q', on=GSK.ColName.DATE)[
+        year_sales_df = monthly_sales_df.groupby(GSK.ColName.SKU)[
             Params.MAPPER_COLUMN_ACTION_UPON.get(GSK.Naming.QUARTER_SUM)].sum().reset_index()
-        year_sales_df[GSK.ColName.DATE] = year_sales_df[GSK.ColName.DATE].apply(
-            lambda dt: dt.replace(hour=Params.SALES_DATA_HOUR))
+        year_sales_df[GSK.ColName.DATE] = pnd.Timestamp(year=self.gsk_dataset_df[GSK.ColName.DATE].dt.year.values[0],
+                                                        month=12,
+                                                        day=31, hour=Params.SALES_DATA_HOUR)
         year_sales_df = pnd.merge(year_sales_df,
                                   monthly_sales_df[[GSK.ColName.DATE, GSK.ColName.SKU, GSK.ColName.NSP]],
                                   on=[GSK.ColName.DATE, GSK.ColName.SKU],
