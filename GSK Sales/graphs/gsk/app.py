@@ -1,5 +1,5 @@
 import os
-
+import sys
 from dash import Dash, Input, Output, State
 import layout
 import data as d
@@ -13,8 +13,13 @@ GSK_SALES_DIR: str = f'{grandparent_dir}{os.sep}output'
 GSK_SALES_FILE_NAME: str = f'{GSK_SALES_DIR}{os.sep}GSK SALES.xlsx'
 d.load(GSK_SALES_FILE_NAME)
 
+print(sys.argv)
+
 VALID_USERNAME_PASSWORD_PAIRS = {
-    'hello': 'world'
+    'Nazim': 'dashb360',
+    'Nadjib': 'passdword',
+    'Fouzi': 'fpassdash',
+    'Hichem': 'datapsw'
 }
 
 app = Dash(__name__)
