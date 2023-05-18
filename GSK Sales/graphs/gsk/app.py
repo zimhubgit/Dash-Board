@@ -5,15 +5,8 @@ import layout
 import data as d
 import dash_auth
 
-current_dir = os.path.abspath(os.curdir)
-parent_dir = os.path.abspath(os.path.join(current_dir, os.pardir))
-grandparent_dir = os.path.abspath(os.path.join(parent_dir, os.pardir))
-
-GSK_SALES_DIR: str = f'{grandparent_dir}{os.sep}output'
-GSK_SALES_FILE_NAME: str = f'{GSK_SALES_DIR}{os.sep}GSK SALES.xlsx'
+GSK_SALES_FILE_NAME = sys.argv[1]
 d.load(GSK_SALES_FILE_NAME)
-
-print(sys.argv)
 
 VALID_USERNAME_PASSWORD_PAIRS = {
     'Nazim': 'dashb360',
