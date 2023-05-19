@@ -5,7 +5,7 @@ import pandas as pnd
 import plotly.express as px
 import plotly.graph_objects as go
 
-from parametres.src import name_space as nm
+from Dash360.utils import name_space as nm
 
 
 class GSKSalesGraph:

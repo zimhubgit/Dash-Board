@@ -1,9 +1,8 @@
 import os
 
 import pandas as pnd
-import sys
-import parametres.src.name_space as nm
-from utilities.src.util import Utilities as Ut
+import Dash360.utils.name_space as nm
+from Dash360.utils.util import Utilities as Ut
 
 
 class Parameters:

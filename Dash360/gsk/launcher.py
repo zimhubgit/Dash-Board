@@ -1,7 +1,7 @@
 import pandas as pnd
-import gsk_sales as sls
-from parametres.src import name_space as nm
-from parametres.src.parameters import Parameters as Params
+from Dash360.gsk import sales as sls
+from Dash360.utils import name_space as nm
+from Dash360.utils.parameters import Parameters as Params
 
 DESIGNATION_CONF: pnd.DataFrame
 SKU_ORDER_DF: pnd.DataFrame

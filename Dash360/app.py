@@ -1,11 +1,22 @@
 import os
 import sys
 from dash import Dash, Input, Output, State
-import layout
-import data as d
+import Dash360.layout as layout
+import gsk.data as d
 import dash_auth
 
-GSK_SALES_FILE_NAME = sys.argv[1]
+file_path = sys.argv[2]
+with open(file_path, 'r') as file:
+    content = file.read()
+
+ARGUMENTS_DICT = {}
+for line in content.split('\n'):
+    if line.strip():  # Skip empty lines
+        key, value = line.split(':', 1)
+        ARGUMENTS_DICT[key.strip()] = value.strip()
+
+GSK_SALES_DIR = sys.argv[1] + ARGUMENTS_DICT['GSK_data_source_dir']
+GSK_SALES_FILE_NAME = GSK_SALES_DIR + os.sep + ARGUMENTS_DICT['GSK_data_file_name']
 d.load(GSK_SALES_FILE_NAME)
 
 VALID_USERNAME_PASSWORD_PAIRS = {

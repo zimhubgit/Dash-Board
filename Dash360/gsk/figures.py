@@ -1,7 +1,7 @@
 import plotly.graph_objects as go
 import plotly.express as px
-import data as d
-import name_space as nm
+import Dash360.gsk.data as d
+import Dash360.gsk.name_map as nm
 import pandas as pnd
 
 figures_cache: dict[str, go.Figure] = {}

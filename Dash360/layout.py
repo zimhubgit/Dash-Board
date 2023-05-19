@@ -1,13 +1,11 @@
 from datetime import datetime
-
 from dash import html, dcc
 import plotly.graph_objects as go
-import figures as fig
-from name_space import NameMap as nmap
-import parametres.src.name_space as nm
+import gsk.figures as fig
+from gsk.name_map import NameMap as nmap
+import Dash360.utils.name_space as nm
 import pandas as pnd
-
-import data as d
+import gsk.data as d
 
 
 class IDs:
