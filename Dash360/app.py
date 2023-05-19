@@ -1,7 +1,7 @@
 import os
 import sys
 from dash import Dash, Input, Output, State
-import Dash360.layout as layout
+import layout as layout
 import gsk.data as d
 import dash_auth
 
