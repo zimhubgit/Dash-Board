@@ -7,7 +7,7 @@ from dash import Dash, dcc, html, Input, Output, State
 import periods
 from parametres.src import name_space as nm
 
-data_dict = pnd.read_excel('/home/nazim/Dev Projects/Dash Board/GSK Sales/output/GSK SALES.xlsx', sheet_name=None)
+data_dict = pnd.read_excel('/home/nazim/Dev Projects/Dash Board/GSK_Sales/output/GSK SALES.xlsx', sheet_name=None)
 sales_df_22 = data_dict['2022']
 sales_df_23 = data_dict['2023']
 update_date = pnd.to_datetime(sales_df_23[nm.GSK.ColName.UPDATED_ON].values[0])
@@ -258,7 +258,7 @@ def sunburst_data(mode: str, period_type: str,
     if brand != nm.GSK.Naming.ALL_SKUs:
         sunburst_df = sunburst_df[sunburst_df[nm.GSK.ColName.BRAND] == brand]
     sunburst_df = sunburst_df[sunburst_df[nm.GSK.ColName.DATE] == date]
-    sunburst_df['RACINE'] = 'GSK Sales'
+    sunburst_df['RACINE'] = 'GSK_Sales'
     sunburst_df['REALISATIONS'] = sunburst_df[mode_dict[mode]['actual']] / sunburst_df[mode_dict[mode]['target']] * 100
     return sunburst_df
 

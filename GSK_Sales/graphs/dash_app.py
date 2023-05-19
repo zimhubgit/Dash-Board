@@ -61,7 +61,7 @@ class PeriodsDates:
 class GskData:
     actual: str = 'actual'
     target: str = 'target'
-    sales = pnd.read_excel('/home/nazim/Dev Projects/Dash Board/GSK Sales/output/GSK SALES.xlsx', sheet_name=None)
+    sales = pnd.read_excel('/home/nazim/Dev Projects/Dash Board/GSK_Sales/output/GSK SALES.xlsx', sheet_name=None)
     actual_year = '2023'
     last_year = '2022'
     update_date = pnd.to_datetime(sales['2023'][nm.GSK.ColName.UPDATED_ON].values[0])
