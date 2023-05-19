@@ -5,6 +5,8 @@ import layout as layout
 import gsk.data as d
 import dash_auth
 
+print(sys.path)
+
 file_path = sys.argv[2]
 with open(file_path, 'r') as file:
     content = file.read()
