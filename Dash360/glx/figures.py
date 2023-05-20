@@ -1,7 +1,7 @@
 import plotly.graph_objects as go
 import plotly.express as px
-import Dash360.glx.data as d
-import Dash360.glx.name_map as nm
+from . import data as d
+from . import name_map as nm
 import pandas as pnd
 
 figures_cache: dict[str, go.Figure] = {}
