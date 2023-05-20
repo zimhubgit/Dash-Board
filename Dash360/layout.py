@@ -1,11 +1,11 @@
 from datetime import datetime
 from dash import html, dcc
 import plotly.graph_objects as go
-import gsk.figures as fig
-from gsk.name_map import NameMap as nmap
+import glx.figures as fig
+from glx.name_map import NameMap as nmap
 import Dash360.utils.name_space as nm
 import pandas as pnd
-import gsk.data as d
+import glx.data as d
 
 
 class IDs:
@@ -473,7 +473,7 @@ class FiguresUpdater:
         parents_df: pnd.DataFrame = parents_dict.get('parent')
         children_df: pnd.DataFrame = parents_dict.get('children')
         for parent in parents_df[nm.GSK.ColName.SKU].tolist():
-            parents_list.append('GSK')
+            parents_list.append('glx')
             children_list.append(parent)
             values_list.append(parents_df[parents_df[nm.GSK.ColName.SKU] == parent][sales_as.achieved].values[0])
             colors_list.append(parents_df[parents_df[nm.GSK.ColName.SKU] == parent][nm.GSK.ColName.COLOR].values[0])

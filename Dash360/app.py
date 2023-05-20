@@ -2,7 +2,7 @@ import os
 import sys
 from dash import Dash, Input, Output, State
 import layout as layout
-import gsk.data as d
+import glx.data as d
 import dash_auth
 
 print(sys.path)
