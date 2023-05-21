@@ -1,11 +1,11 @@
 import os
 import sys
-from dash import Dash, Input, Output, State
-import layout as layout
-import glx.data as d
-import dash_auth
 
-print(sys.path)
+import dash_auth
+from dash import Dash, Input, Output, State
+
+import glx.data as d
+import layout as layout
 
 file_path = sys.argv[2]
 with open(file_path, 'r') as file:

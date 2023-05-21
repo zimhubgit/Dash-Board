@@ -3,9 +3,9 @@ from dash import html, dcc
 import plotly.graph_objects as go
 import glx.figures as fig
 from glx.name_map import NameMap as nmap
-import Dash360.utils.name_space as nm
 import pandas as pnd
 import glx.data as d
+from .utils import name_space as nm
 
 
 class IDs:
