@@ -4,8 +4,10 @@ import sys
 import dash_auth
 from dash import Dash, Input, Output, State
 
-import glx.data as d
+# import glx.data as d
 import layout as layout
+
+print(sys.path)
 
 file_path = sys.argv[2]
 with open(file_path, 'r') as file:
