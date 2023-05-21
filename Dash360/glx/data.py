@@ -1,4 +1,4 @@
-from ..helpers import name_space as nm
+from Dash360.helpers import name_space as nm
 import pandas as pnd
 
 ly_key = '2022'
