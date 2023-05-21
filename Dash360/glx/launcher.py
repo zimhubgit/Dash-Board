@@ -1,5 +1,5 @@
 import pandas as pnd
-import sales as sls
+from . import sales as sls
 from Dash360.utils import name_space as nm
 from Dash360.utils.parameters import Parameters as Params
 
