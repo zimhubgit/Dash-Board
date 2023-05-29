@@ -5,7 +5,7 @@ import glx.figures as fig
 from glx.name_map import NameMap as nmap
 import pandas as pnd
 import glx.data as d
-from .glx import name_space as nm
+import glx.name_space as nm
 
 
 class IDs:
