@@ -1,8 +1,8 @@
 import os
 
 import pandas as pnd
-import Dash360.helpers.name_space as nm
-from Dash360.helpers.util import Utilities as Ut
+import Dash360.glx.name_space as nm
+from Dash360.glx.util import Utilities as Ut
 
 
 class Parameters:

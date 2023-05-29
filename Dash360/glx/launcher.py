@@ -1,7 +1,6 @@
 import pandas as pnd
-from . import sales as sls
-from Dash360.helpers import name_space as nm
-from Dash360.helpers.parameters import Parameters as Params
+from . import sales as sls, name_space as nm
+from Dash360.glx.parameters import Parameters as Params
 
 DESIGNATION_CONF: pnd.DataFrame
 SKU_ORDER_DF: pnd.DataFrame
