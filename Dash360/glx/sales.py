@@ -3,9 +3,9 @@ from datetime import datetime
 import numpy as np
 import pandas as pnd
 
-from Dash360.glx.name_space import GSK
-from Dash360.glx.parameters import Parameters as Params
-from Dash360.glx.util import Utilities
+from name_space import GSK
+from parameters import Parameters as Params
+from util import Utilities
 
 Ut = Utilities()
 
