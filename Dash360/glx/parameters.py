@@ -8,7 +8,7 @@ from Dash360.glx.util import Utilities as Ut
 class Parameters:
     INPUT_DIR: str = f'{os.getcwd()}{os.sep}input{os.sep}'
     SALES_FILE_NAME_LIST: list[str] = [INPUT_DIR + 'SUIVI LIVRAISONS ATP 21  Decembre. 2022.xlsx',
-                                       INPUT_DIR + 'SUIVI LIVRAISONS ATP  18  Mai. 2023.xlsx']
+                                       INPUT_DIR + 'SUIVI LIVRAISONS ATP  24  Avril. 2023.xlsx']
     PARAMETERS_FILE_NAME = f'{os.getcwd()}{os.sep}input{os.sep}MAPPER.xlsx'
     OUTPUT_DIR = f'{os.getcwd()}{os.sep}output{os.sep}'
     OUTPUT_DATA_FILE_NAME = OUTPUT_DIR + nm.GSK.Naming.SALES_OUTPUT_FILE_NAME

@@ -3,9 +3,9 @@ from datetime import datetime
 import numpy as np
 import pandas as pnd
 
-from name_space import GSK
-from parameters import Parameters as Params
-from util import Utilities
+from .name_space import GSK
+from .parameters import Parameters as Params
+from .util import Utilities
 
 Ut = Utilities()
 
